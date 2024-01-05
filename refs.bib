@@ -1,0 +1,36 @@
+%%
+%% DBLP + 著者名 などでググると BibTeX の書き方がヒットします．
+%% DBLP の内容は比較的信用できますが，時々間違っているので注意が必要です．
+%% 特に，論文タイトルなどで，固有名詞がちゃんと大文字になっていないことがあるので，
+%% その場合は大文字にすべきところを {...} で囲って下さい．
+%% （BibTeX では，先頭の文字を除いて，勝手に小文字に変換されます．）
+%%
+%% ex)  title = {OCaml for Numerical Analysis}
+%% ==>  title = {{OC}aml for Numerical Analysis}
+%%
+
+%%（これは DBLP ではなく，Pierce の Web ページから持ってきたもの）
+@book{Pierce:TypeSystems,
+  author = {Benjamin C. Pierce},
+  title = {Types and Programming Languages},
+  publisher = {MIT Press},
+  year = 2002,
+  plclub = {Yes},
+  bcp = {Yes},
+  keys = {books},
+  homepage = {http://www.cis.upenn.edu/~bcpierce/tapl},
+  errata = {http://www.cis.upenn.edu/~bcpierce/tapl/errata.txt}
+}
+
+@InProceedings{10.1007/3-540-44898-5_4,
+author="Boyland, John",
+editor="Cousot, Radhia",
+title="Checking Interference with Fractional Permissions",
+booktitle="Static Analysis",
+year="2003",
+publisher="Springer Berlin Heidelberg",
+address="Berlin, Heidelberg",
+pages="55--72",
+abstract="We describe a type system for checking interference using the concept of linear capabilities (which we call ``permissions''). Our innovations include the concept of ``fractional'' permissions: reads can be permitted with fractional permissions whereas writes require complete permissions. This distinction expresses the fact that reads on the same state do not conflict with each other. One may give shared read access at one point while still retaining write permission afterwards. We give an operational semantics of a simple imperative language with structured parallelism and prove that the permission system enables parallelism to proceed with deterministic results.",
+isbn="978-3-540-44898-3"
+}
