@@ -1,0 +1,14 @@
+\begin{thebibliography}{1}
+
+\bibitem{10.1007/3-540-44898-5_4}
+John Boyland.
+\newblock Checking interference with fractional permissions.
+\newblock In Radhia Cousot, editor, {\em Static Analysis}, pp. 55--72, Berlin,
+  Heidelberg, 2003. Springer Berlin Heidelberg.
+
+\bibitem{10.1145/3158154}
+Ralf Jung, Jacques-Henri Jourdan, Robbert Krebbers, and Derek Dreyer.
+\newblock Rustbelt: Securing the foundations of the rust programming language.
+\newblock {\em Proc. ACM Program. Lang.}, Vol.~2, No. POPL, dec 2017.
+
+\end{thebibliography}
