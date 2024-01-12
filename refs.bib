@@ -53,3 +53,36 @@ articleno = {66},
 numpages = {34},
 keywords = {concurrency, logical relations, Rust, separation logic, type systems}
 }
+
+@InProceedings{10.1007/978-3-642-10672-9_11,
+author="Suenaga, Kohei
+and Kobayashi, Naoki",
+editor="Hu, Zhenjiang",
+title="Fractional Ownerships for Safe Memory Deallocation",
+booktitle="Programming Languages and Systems",
+year="2009",
+publisher="Springer Berlin Heidelberg",
+address="Berlin, Heidelberg",
+pages="128--143",
+abstract="We propose a type system for a programming language with memory allocation/deallocation primitives, which prevents memory- related errors such as double-frees and memory leaks. The main idea is to augment pointer types with fractional ownerships, which express both capabilities and obligations to access or deallocate memory cells. By assigning an ownership to each pointer type constructor (rather than to a variable), our type system can properly reason about list/tree-manipulating programs. Furthermore, thanks to the use of fractions as ownerships, the type system admits a polynomial-time type inference algorithm, which serves as an algorithm for automatic verification of lack of memory-related errors. A prototype verifier has been implemented and tested for C programs.",
+isbn="978-3-642-10672-9"
+}
+
+@InProceedings{10.1007/978-3-031-50521-8_11,
+author="Nakayama, Takashi
+and Matsushita, Yusuke
+and Sakayori, Ken
+and Sato, Ryosuke
+and Kobayashi, Naoki",
+editor="Dimitrova, Rayna
+and Lahav, Ori
+and Wolff, Sebastian",
+title="Borrowable Fractional Ownership Types for Verification",
+booktitle="Verification, Model Checking, and Abstract Interpretation",
+year="2024",
+publisher="Springer Nature Switzerland",
+address="Cham",
+pages="224--246",
+abstract="Automated verification of functional correctness of imperative programs with references (a.k.a. pointers) is challenging because of reference aliasing. Ownership types have recently been applied to address this issue, but the existing approaches were limited in that they are effective only for a class of programs whose reference usage follows a certain style. To relax the limitation, we combine the approaches of ConSORT (based on fractional ownership) and RustHorn (based on borrowable ownership), two recent approaches to automated program verification based on ownership types, and propose the notion of borrowable fractional ownership types. We formalize a new type system based on the borrowable fractional ownership types and show how we can use it to automatically reduce the program verification problem for imperative programs with references to that for functional programs without references. We also show the soundness of our type system and the translation, and conduct experiments to confirm the effectiveness of our approach.",
+isbn="978-3-031-50521-8"
+}

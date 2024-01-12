@@ -193,17 +193,13 @@ Rustの静的なownershipに戻すことができる。
 Rustは、実行時ガベージコレクタを基本的に使用せず、ownershipの概念に基づき静的なメモリ管理を行うプログラミング言語であり、システムプログラミング等に用いられる。
 しかし、静的なownershipのみによるメモリ管理は柔軟性に欠ける場合があるため、
 Rustには\texttt{Rc}(参照カウント)オブジェクトが存在する。
-\texttt{Rc}オブジェクトはコンテナであり、中身のオブジェクトへの参照を持つ。
-\texttt{Rc}オブジェクトはclone関数により複製でき、その際共通の参照カウントを1増やす。
-複製が消滅する際には参照カウントを1減らし、
-参照カウントが0になったら中身のオブジェクトを解放する。
-そのため、
-意図せず複製が残っていると
+しかし、\texttt{Rc}オブジェクトを利用した際、
+意図せず複製が残っている場合があり、
 メモリリークのおそれがある。
 \section{目的}
 本研究では、fractional ownership [Boyland 2003]の考え方を取り入れて、
 Rustの静的なownershipによるメモリ管理と、動的な参照カウントの柔軟性を組み合わせ、
-ユーザの意図していないメモリリークを防ぐことを目的とする。
+ユーザの意図していないメモリリークを防ぐ方式を提案・実装することを目的とする。
 
 \section{本論文の構成}
 本論文では、まず第2章でRustのownership、\texttt{Rc}オブジェクト、並列処理について述べた後、第3章で本研究で提案する新たな参照オブジェクトについて述べる。その後第4章で新たな参照オブジェクトについての考察を述べ、第5章で関連研究、第6章で結論と今後の課題を述べる。
@@ -276,7 +272,7 @@ ownershipをborrowingしている例を以下のソースコード\ref{borrowing
 7行目で\texttt{s}のownershipが一時的に関数\texttt{f}の引数\texttt{x}に貸しだされる。
 ownershipが貸しだされているため、\texttt{x}は\texttt{String}オブジェクトのownerとなり、
 2行目の処理を行うことができる。
-関数\texttt{f}の処理が終了した後、\texttt{x}に貸しだされていたownershipは変数\texttt{s}に返される。
+関数\texttt{f}の処理が終了した後、\texttt{x}に貸しだされていたownershipは変数\texttt{s}に返却される。
 そのため、8行目で\texttt{s}はownerであり、\texttt{s}に対して処理が可能である。
 
 \begin{lstlisting}[language=Rust, caption=borrowingの例, label=borrowing_example, captionpos=b]
@@ -315,8 +311,9 @@ Rustの静的なownershipのみによるメモリ管理は柔軟性に欠ける�
 また、\texttt{clone}関数により複製でき、その際共通の参照カウントを1増やす。
 複製が消滅する際には参照カウントを1減らし、
 参照カウントが0になったら中身のオブジェクトを解放する。
+
 実際には、以下のソースコード\ref{rc_example}のように用いられる。
-このプログラムは、中身に\texttt{Hello}という\texttt{String}オブジェクトを持つ\texttt{Rc}オブジェクト\texttt{h}と、中身に\texttt{World}という\texttt{String}オブジェクトを持つ\texttt{Rc}オブジェクト\texttt{w}の複製をランダムに10回配列に入れ、その配列から\texttt{Hello}という\texttt{String}オブジェクトを持つ\texttt{Rc}オブジェクトを削除するプログラムである。配列の要素は実行する度に変化するため、実行時に検査が必要な例である。
+このプログラムは、中身に\texttt{Hello}という\texttt{String}オブジェクトを持つ\texttt{Rc}オブジェクト\texttt{h}と、中身に\texttt{World}という\texttt{String}オブジェクトを持つ\texttt{Rc}オブジェクト\texttt{w}の複製をランダムに10回配列に入れ、その配列から\texttt{Hello}という\texttt{String}オブジェクトを持つ\texttt{Rc}オブジェクトを削除するプログラムである。配列の要素は実行する度に変化するため、静的なownershipのみではメモリ管理が難しい例である。
 12行目と16行目では\texttt{clone}関数により、\texttt{Rc}オブジェクトの複製を生成し、参照カウントが1増えている。
 20行目で\texttt{h}の複製は1つを残してすべて消滅し、\texttt{h}の参照カウントは1まで減少する。
 最後に21行目で\texttt{h}、\texttt{w}の参照カウントは0となり、中身のオブジェクトが解放される。
@@ -344,11 +341,11 @@ fn main() {
 }
 \end{lstlisting}
 
-\section{Rc利用の際の問題点}
-仮に上のソースコード\ref{rc_example}において、20行目の直後に\texttt{Rc}オブジェクト\texttt{h}と\texttt{Rc}オブジェクト\texttt{w}を用いない処理が行われているとする。このとき、2つの\texttt{Rc}オブジェクトの中身が解放されるのは21行目で\texttt{main}関数のスコープが終了したときであり、追加した新たな処理で\texttt{h}も\texttt{w}もどちらも利用していないにもかかわらずメモリ領域が確保されたままとなってしまう。このように、\texttt{Rc}オブジェクトを用いた場合、意図せず複製が残ってしまうことでメモリリークが発生するおそれがある。
+\section{Rcの問題点}
+仮に上のソースコード\ref{rc_example}において、20行目の直後に\texttt{Rc}オブジェクト\texttt{h}と\texttt{Rc}オブジェクト\texttt{w}を用いない処理が行われているとする。このとき、2つの\texttt{Rc}オブジェクトの中身が解放されるのは21行目で\texttt{main}関数のスコープが終了したときであり、追加した新たな処理で\texttt{h}も\texttt{w}もどちらも利用していないにもかかわらずメモリ領域が確保されたままとなってしまう。このように、\texttt{Rc}オブジェクトを用いた場合、意図せずメモリリークが発生するおそれがある。
 
 \section{Rustの並列処理}
-静的なownershipで柔軟性に欠ける例として、並列処理の例がある。
+静的なownershipで柔軟性に欠ける例として、並列処理の例もある。
 
 \subsection{通常のスレッド}
 Rustの通常のスレッド生成では、ownerは高々一つのスレッドにmoveし、複数のスレッドにmoveすることはできない。以下のソースコード\ref{thread_example}は、Rustで通常のスレッドを生成する例であり、3行目にある\texttt{move}キーワードによりmoveが起きる。
@@ -440,7 +437,7 @@ fn main() {
 \section{実装}
 mutableな参照オブジェクト、immutableな参照オブジェクトは以下のソースコード\ref{struct_implementation}のように実装した。
 mutableな参照オブジェクトは、オブジェクトを保持するコンテナとして実装した。
-immutableな参照オブジェクトは、Rustのownershipを無視する特別なポインタであるNonNullオブジェクトを保持するオブジェクトとして実装した。immutableな参照内のポインタはNewRefInnerオブジェクトへのポインタであり、このオブジェクトは参照カウントと中身のオブジェクトを保持する。
+immutableな参照オブジェクトは、Rustのownershipを無視する特別なポインタであるNonNullオブジェクトを保持するオブジェクトとして実装した。NonNullオブジェクトにより、参照の複製が可能になる。immutableな参照内のポインタはNewRefInnerオブジェクトへのポインタであり、このオブジェクトは参照カウントと中身のオブジェクトを保持する。
 \begin{lstlisting}[language=Rust, caption=新たな参照オブジェクトの実装, label=struct_implementation, captionpos=b]
 pub struct RefMut<T: ?Sized> {
     data: T,
@@ -526,6 +523,8 @@ fn drop(&mut self) {
 
 \section{例}
 実際のプログラムで、本研究の参照オブジェクトを利用した例が以下のソースコード\ref{random_example}である。
+このプログラムは、中身に\texttt{Hello}という\texttt{String}オブジェクトを持つmutableな参照オブジェクト\texttt{h}と、中身に\texttt{World}という\texttt{String}オブジェクトを持つmutableな参照オブジェクト\texttt{w}をどちらもimmutableな参照オブジェクトに変換した後、複製をランダムに10回配列に入れ、その配列から\texttt{Hello}という\texttt{String}オブジェクトを持つimmutableな参照オブジェクトを削除するプログラムである。
+7、8行目で生成したmutableな参照を、10、11行目でimmutableな参照に変換し、14、19行目でimmutableな参照を複製している。\texttt{remove\_string}が終了した後、26行目、32行目でmutableな参照に戻している。
 \begin{lstlisting}[language=Rust, caption=新たな参照オブジェクトを用いた柔軟なメモリ管理の例, label=random_example, captionpos=b]
 fn remove_string(vec: &mut Vec<RefImmut<String>>, s: String) {
     vec.retain(|x| **x != s);
@@ -557,13 +556,8 @@ fn main() {
     println!("{}", h_mut);
     drop(h_mut);
 
-    for x in vec.iter() {
-        println!("{}", x);
-    }
     drop(vec);
-    let mut h_new = h_immut.back_to_mut();
-    h_new.push_str("wwwww");
-    println!("{}, from main", h_new);
+    let mut w_mut = w_immut.back_to_mut();
 }
 \end{lstlisting}
 
