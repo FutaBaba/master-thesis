@@ -1,15 +1,39 @@
 \begin{thebibliography}{1}
 
-\bibitem{10.1007/3-540-44898-5_4}
+\bibitem{DBLP:conf/sigada/MatsakisK14}
+Nicholas~D. Matsakis and Felix S.~Klock II.
+\newblock The rust language.
+\newblock In Michael~B. Feldman and S.~Tucker Taft, editors, {\em Proceedings
+  of the 2014 {ACM} SIGAda annual conference on High integrity language
+  technology, {HILT} 2014, Portland, Oregon, USA, October 18-21, 2014}, pp.
+  103--104. {ACM}, 2014.
+
+\bibitem{DBLP:conf/oopsla/ClarkePN98}
+David~G. Clarke, John Potter, and James Noble.
+\newblock Ownership types for flexible alias protection.
+\newblock In Bj{\o}rn~N. Freeman{-}Benson and Craig Chambers, editors, {\em
+  Proceedings of the 1998 {ACM} {SIGPLAN} Conference on Object-Oriented
+  Programming Systems, Languages {\&} Applications, {OOPSLA} 1998, Vancouver,
+  British Columbia, Canada, October 18-22, 1998}, pp. 48--64. {ACM}, 1998.
+
+\bibitem{DBLP:journals/cacm/CouroisHP71}
+Pierre{-}Jacques Courtois, F.~Heymans, and David~Lorge Parnas.
+\newblock Concurrent control with "readers" and "writers".
+\newblock {\em Commun. {ACM}}, Vol.~14, No.~10, pp. 667--668, 1971.
+
+\bibitem{DBLP:conf/sas/Boyland03}
 John Boyland.
 \newblock Checking interference with fractional permissions.
-\newblock In Radhia Cousot, editor, {\em Static Analysis}, pp. 55--72, Berlin,
-  Heidelberg, 2003. Springer Berlin Heidelberg.
+\newblock In Radhia Cousot, editor, {\em Static Analysis, 10th International
+  Symposium, {SAS} 2003, San Diego, CA, USA, June 11-13, 2003, Proceedings},
+  Vol. 2694 of {\em Lecture Notes in Computer Science}, pp. 55--72. Springer,
+  2003.
 
-\bibitem{10.1145/3158154}
-Ralf Jung, Jacques-Henri Jourdan, Robbert Krebbers, and Derek Dreyer.
-\newblock Rustbelt: Securing the foundations of the rust programming language.
-\newblock {\em Proc. ACM Program. Lang.}, Vol.~2, No. POPL, dec 2017.
+\bibitem{10.1007/978-3-642-10672-9_11}
+Kohei Suenaga and Naoki Kobayashi.
+\newblock Fractional ownerships for safe memory deallocation.
+\newblock In Zhenjiang Hu, editor, {\em Programming Languages and Systems}, pp.
+  128--143, Berlin, Heidelberg, 2009. Springer Berlin Heidelberg.
 
 \bibitem{10.1007/978-3-031-50521-8_11}
 Takashi Nakayama, Yusuke Matsushita, Ken Sakayori, Ryosuke Sato, and Naoki
@@ -19,10 +43,11 @@ Takashi Nakayama, Yusuke Matsushita, Ken Sakayori, Ryosuke Sato, and Naoki
   Verification, Model Checking, and Abstract Interpretation}, pp. 224--246,
   Cham, 2024. Springer Nature Switzerland.
 
-\bibitem{10.1007/978-3-642-10672-9_11}
-Kohei Suenaga and Naoki Kobayashi.
-\newblock Fractional ownerships for safe memory deallocation.
-\newblock In Zhenjiang Hu, editor, {\em Programming Languages and Systems}, pp.
-  128--143, Berlin, Heidelberg, 2009. Springer Berlin Heidelberg.
+\bibitem{DBLP:journals/pacmpl/0002JKD18}
+Ralf Jung, Jacques{-}Henri Jourdan, Robbert Krebbers, and Derek Dreyer.
+\newblock Rust{B}elt: securing the foundations of the rust programming
+  language.
+\newblock {\em Proc. {ACM} Program. Lang.}, Vol.~2, No. {POPL}, pp.
+  66:1--66:34, 2018.
 
 \end{thebibliography}

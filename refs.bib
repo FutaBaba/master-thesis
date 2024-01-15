@@ -9,49 +9,79 @@
 %% ==>  title = {{OC}aml for Numerical Analysis}
 %%
 
-%%（これは DBLP ではなく，Pierce の Web ページから持ってきたもの）
-@book{Pierce:TypeSystems,
-  author = {Benjamin C. Pierce},
-  title = {Types and Programming Languages},
-  publisher = {MIT Press},
-  year = 2002,
-  plclub = {Yes},
-  bcp = {Yes},
-  keys = {books},
-  homepage = {http://www.cis.upenn.edu/~bcpierce/tapl},
-  errata = {http://www.cis.upenn.edu/~bcpierce/tapl/errata.txt}
+@inproceedings{DBLP:conf/sigada/MatsakisK14,
+  author       = {Nicholas D. Matsakis and
+                  Felix S. Klock II},
+  editor       = {Michael B. Feldman and
+                  S. Tucker Taft},
+  title        = {The rust language},
+  booktitle    = {Proceedings of the 2014 {ACM} SIGAda annual conference on High integrity
+                  language technology, {HILT} 2014, Portland, Oregon, USA, October 18-21,
+                  2014},
+  pages        = {103--104},
+  publisher    = {{ACM}},
+  year         = {2014},
+  url          = {https://doi.org/10.1145/2663171.2663188},
+  doi          = {10.1145/2663171.2663188},
+  timestamp    = {Fri, 02 Jun 2023 17:16:28 +0200},
+  biburl       = {https://dblp.org/rec/conf/sigada/MatsakisK14.bib},
+  bibsource    = {dblp computer science bibliography, https://dblp.org}
 }
 
-@InProceedings{10.1007/3-540-44898-5_4,
-author="Boyland, John",
-editor="Cousot, Radhia",
-title="Checking Interference with Fractional Permissions",
-booktitle="Static Analysis",
-year="2003",
-publisher="Springer Berlin Heidelberg",
-address="Berlin, Heidelberg",
-pages="55--72",
-abstract="We describe a type system for checking interference using the concept of linear capabilities (which we call ``permissions''). Our innovations include the concept of ``fractional'' permissions: reads can be permitted with fractional permissions whereas writes require complete permissions. This distinction expresses the fact that reads on the same state do not conflict with each other. One may give shared read access at one point while still retaining write permission afterwards. We give an operational semantics of a simple imperative language with structured parallelism and prove that the permission system enables parallelism to proceed with deterministic results.",
-isbn="978-3-540-44898-3"
+@inproceedings{DBLP:conf/oopsla/ClarkePN98,
+  author       = {David G. Clarke and
+                  John Potter and
+                  James Noble},
+  editor       = {Bj{\o}rn N. Freeman{-}Benson and
+                  Craig Chambers},
+  title        = {Ownership Types for Flexible Alias Protection},
+  booktitle    = {Proceedings of the 1998 {ACM} {SIGPLAN} Conference on Object-Oriented
+                  Programming Systems, Languages {\&} Applications, {OOPSLA} 1998,
+                  Vancouver, British Columbia, Canada, October 18-22, 1998},
+  pages        = {48--64},
+  publisher    = {{ACM}},
+  year         = {1998},
+  url          = {https://doi.org/10.1145/286936.286947},
+  doi          = {10.1145/286936.286947},
+  timestamp    = {Wed, 30 Mar 2022 13:58:30 +0200},
+  biburl       = {https://dblp.org/rec/conf/oopsla/ClarkePN98.bib},
+  bibsource    = {dblp computer science bibliography, https://dblp.org}
 }
 
-@article{10.1145/3158154,
-author = {Jung, Ralf and Jourdan, Jacques-Henri and Krebbers, Robbert and Dreyer, Derek},
-title = {RustBelt: Securing the Foundations of the Rust Programming Language},
-year = {2017},
-issue_date = {January 2018},
-publisher = {Association for Computing Machinery},
-address = {New York, NY, USA},
-volume = {2},
-number = {POPL},
-url = {https://doi.org/10.1145/3158154},
-doi = {10.1145/3158154},
-abstract = {Rust is a new systems programming language that promises to overcome the seemingly fundamental tradeoff between high-level safety guarantees and low-level control over resource management. Unfortunately, none of Rust's safety claims have been formally proven, and there is good reason to question whether they actually hold. Specifically, Rust employs a strong, ownership-based type system, but then extends the expressive power of this core type system through libraries that internally use unsafe features. In this paper, we give the first formal (and machine-checked) safety proof for a language representing a realistic subset of Rust. Our proof is extensible in the sense that, for each new Rust library that uses unsafe features, we can say what verification condition it must satisfy in order for it to be deemed a safe extension to the language. We have carried out this verification for some of the most important libraries that are used throughout the Rust ecosystem.},
-journal = {Proc. ACM Program. Lang.},
-month = {dec},
-articleno = {66},
-numpages = {34},
-keywords = {concurrency, logical relations, Rust, separation logic, type systems}
+@inproceedings{DBLP:conf/sas/Boyland03,
+  author       = {John Boyland},
+  editor       = {Radhia Cousot},
+  title        = {Checking Interference with Fractional Permissions},
+  booktitle    = {Static Analysis, 10th International Symposium, {SAS} 2003, San Diego,
+                  CA, USA, June 11-13, 2003, Proceedings},
+  series       = {Lecture Notes in Computer Science},
+  volume       = {2694},
+  pages        = {55--72},
+  publisher    = {Springer},
+  year         = {2003},
+  url          = {https://doi.org/10.1007/3-540-44898-5\_4},
+  doi          = {10.1007/3-540-44898-5\_4},
+  timestamp    = {Tue, 14 May 2019 10:00:52 +0200},
+  biburl       = {https://dblp.org/rec/conf/sas/Boyland03.bib},
+  bibsource    = {dblp computer science bibliography, https://dblp.org}
+}
+
+@article{DBLP:journals/pacmpl/0002JKD18,
+  author       = {Ralf Jung and
+                  Jacques{-}Henri Jourdan and
+                  Robbert Krebbers and
+                  Derek Dreyer},
+  title        = {Rust{B}elt: securing the foundations of the rust programming language},
+  journal      = {Proc. {ACM} Program. Lang.},
+  volume       = {2},
+  number       = {{POPL}},
+  pages        = {66:1--66:34},
+  year         = {2018},
+  url          = {https://doi.org/10.1145/3158154},
+  doi          = {10.1145/3158154},
+  timestamp    = {Sat, 30 Sep 2023 10:23:23 +0200},
+  biburl       = {https://dblp.org/rec/journals/pacmpl/0002JKD18.bib},
+  bibsource    = {dblp computer science bibliography, https://dblp.org}
 }
 
 @InProceedings{10.1007/978-3-642-10672-9_11,
@@ -85,4 +115,21 @@ address="Cham",
 pages="224--246",
 abstract="Automated verification of functional correctness of imperative programs with references (a.k.a. pointers) is challenging because of reference aliasing. Ownership types have recently been applied to address this issue, but the existing approaches were limited in that they are effective only for a class of programs whose reference usage follows a certain style. To relax the limitation, we combine the approaches of ConSORT (based on fractional ownership) and RustHorn (based on borrowable ownership), two recent approaches to automated program verification based on ownership types, and propose the notion of borrowable fractional ownership types. We formalize a new type system based on the borrowable fractional ownership types and show how we can use it to automatically reduce the program verification problem for imperative programs with references to that for functional programs without references. We also show the soundness of our type system and the translation, and conduct experiments to confirm the effectiveness of our approach.",
 isbn="978-3-031-50521-8"
+}
+
+@article{DBLP:journals/cacm/CouroisHP71,
+  author       = {Pierre{-}Jacques Courtois and
+                  F. Heymans and
+                  David Lorge Parnas},
+  title        = {Concurrent Control with "Readers" and "Writers"},
+  journal      = {Commun. {ACM}},
+  volume       = {14},
+  number       = {10},
+  pages        = {667--668},
+  year         = {1971},
+  url          = {https://doi.org/10.1145/362759.362813},
+  doi          = {10.1145/362759.362813},
+  timestamp    = {Tue, 06 Nov 2018 12:51:36 +0100},
+  biburl       = {https://dblp.org/rec/journals/cacm/CouroisHP71.bib},
+  bibsource    = {dblp computer science bibliography, https://dblp.org}
 }

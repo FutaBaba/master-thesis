@@ -1,3 +1,4 @@
+\contentsline {chapter}{謝辞}{iii}%
 \contentsline {chapter}{\numberline {第1章}序論}{1}%
 \contentsline {section}{\numberline {1.1}背景}{1}%
 \contentsline {section}{\numberline {1.2}目的}{1}%
@@ -6,21 +7,20 @@
 \contentsline {section}{\numberline {2.1}Rustのownership}{2}%
 \contentsline {subsection}{\numberline {2.1.1}ownership}{2}%
 \contentsline {subsection}{\numberline {2.1.2}move}{2}%
-\contentsline {subsection}{\numberline {2.1.3}borrowing}{3}%
+\contentsline {subsection}{\numberline {2.1.3}borrowing}{4}%
 \contentsline {subsection}{\numberline {2.1.4}lifetime}{4}%
-\contentsline {section}{\numberline {2.2}Rc}{4}%
-\contentsline {section}{\numberline {2.3}Rcの問題点}{5}%
-\contentsline {section}{\numberline {2.4}Rustの並列処理}{5}%
-\contentsline {subsection}{\numberline {2.4.1}通常のスレッド}{5}%
-\contentsline {subsection}{\numberline {2.4.2}scoped thread}{6}%
-\contentsline {section}{\numberline {2.5}並列処理の際の問題点}{6}%
-\contentsline {chapter}{\numberline {第3章}分数権限を動的に検査する参照オブジェクトの提案}{8}%
-\contentsline {section}{\numberline {3.1}fractional ownership}{8}%
-\contentsline {section}{\numberline {3.2}インターフェース}{8}%
-\contentsline {section}{\numberline {3.3}実装}{9}%
-\contentsline {section}{\numberline {3.4}例}{11}%
-\contentsline {chapter}{\numberline {第4章}考察}{16}%
-\contentsline {chapter}{\numberline {第5章}関連研究}{18}%
-\contentsline {chapter}{\numberline {第6章}結論と今後の課題}{19}%
-\contentsline {chapter}{謝辞}{20}%
-\contentsline {chapter}{参考文献}{21}%
+\contentsline {section}{\numberline {2.2}Rustの参照カウント}{5}%
+\contentsline {section}{\numberline {2.3}静的なfractional ownership}{6}%
+\contentsline {chapter}{\numberline {第3章}問題点}{7}%
+\contentsline {chapter}{\numberline {第4章}本研究の提案}{10}%
+\contentsline {section}{\numberline {4.1}提案するインターフェース}{10}%
+\contentsline {section}{\numberline {4.2}実装}{14}%
+\contentsline {chapter}{\numberline {第5章}並列処理への応用}{18}%
+\contentsline {section}{\numberline {5.1}Rustの並列処理}{18}%
+\contentsline {subsection}{\numberline {5.1.1}通常のスレッド}{18}%
+\contentsline {subsection}{\numberline {5.1.2}scoped thread}{18}%
+\contentsline {section}{\numberline {5.2}並列処理の際の問題点}{19}%
+\contentsline {section}{\numberline {5.3}新たな参照オブジェクトの応用}{20}%
+\contentsline {chapter}{\numberline {第6章}関連研究}{21}%
+\contentsline {chapter}{\numberline {第7章}結論と今後の課題}{22}%
+\contentsline {chapter}{参考文献}{23}%
