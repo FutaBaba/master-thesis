@@ -9,8 +9,9 @@
 \usepackage{bussproofs} % 証明器
 
 \usepackage{listings, jvlisting} % ソースコード
-\usepackage{listings-rust}
+\usepackage{plistings}
 \usepackage{amsthm} % 定理環境
+\usepackage{color}
 
 %% =========================================
 %% 定理環境の設定
@@ -70,10 +71,11 @@
 
 % プログラミング言語と表示するフォント等の設定
 \lstset{
-  language={Rust},% プログラミング言語
+  language={},% プログラミング言語
   basicstyle={\ttfamily\small},% ソースコードのテキストのスタイル
   keywordstyle={\bfseries},% 予約語等のキーワードのスタイル
-  commentstyle={},% コメントのスタイル
+  commentstyle={\ttfamily\small},% コメントのスタイル
+  morecomment = [l]{//},
   stringstyle={},% 文字列のスタイル
   frame=trlb,% ソースコードの枠線の設定 (none だと非表示)
   numbers=left,% 行番号の表示 (none だと非表示)
@@ -81,9 +83,9 @@
   xleftmargin=15pt,% 左余白
   xrightmargin=5pt,% 右余白
   keepspaces=true,% 空白を維持する
-  mathescape,% $ で囲った部分を数式として表示する ($ がソースコード中で使えなくなるので注意)
+  % mathescape,% $ で囲った部分を数式として表示する ($ がソースコード中で使えなくなるので注意)
   % 手動強調表示の設定
-  moredelim=[is][\bfseries]{@*}{*@},
+  moredelim=[is][\color{red}\bfseries]{@*}{*@},
   moredelim=[is][\itshape]{@/}{/@}
 }
 \lstMakeShortInline[columns=fullflexible]|% 本文中にコードを|foo|の形式で書くことができます
@@ -135,7 +137,7 @@
 
 Rustはownership (所有権)の概念に基づいて安全な静的メモリ管理を行うプログラミング言語である。
 Rustでは、各オブジェクトに唯一のownerが静的に定められている。
-ownershipは、変数への代入や関数に引数を渡す際に移動する。
+Ownershipは、変数への代入や関数に引数を渡す際に移動する。
 オブジェクトのメモリ領域は、ownerのスコープが終了すると解放される。
 % *Borrowingの説明*また、オブジェクトが束縛されている変数の(Rustに特有の狭い意味での)参照を作成することで、ownerhsipを一時的に借りることができる。
 % *Lifetimeの説明*Rustでは、参照が有効であるプログラムの文面上の静的な範囲はライフタイムと呼ばれる。
@@ -154,7 +156,7 @@ ownershipは、変数への代入や関数に引数を渡す際に移動する�
 そこで
 本研究ではfractional ownership [Boyland 2003]の考え方を取り入れて、
 Rustの静的なownershipによるメモリ管理と、動的な参照カウントの柔軟性を組み合わせる。
-fractional ownershipとは0以上かつ1以下の有理数であり、
+Fractional ownershipとは0以上かつ1以下の有理数であり、
 オブジェクト生成時にはownershipとして1を与え、参照複製時にはownershipを分割し、
 複製された参照が消滅する際にはownershipを集約する。
 また、オブジェクトの解放にはownership 1が必要であり、逆にownershipが0より大きいオブジェクトは
@@ -217,23 +219,13 @@ Rustの静的なownershipによるメモリ管理と、動的な参照カウン�
 
 \section{Rustのownership}
 
-\subsection{ownership}
+\subsection{Ownership}
+% 文頭と見出しは英語は大文字に
+% TODO RustBeltでownerはどうなってるか確認 ownerはアクセスが許されている参照
 Rustはownershipという概念に基づいて安全な静的メモリ管理を行っている。
 Rustでは、各オブジェクトに唯一のownerが静的に定められており、
 オブジェクトのメモリ領域は、ownerのスコープが終了すると開放される。
 実際の例を
-% 以下の図\ref{ownership_example}に示す。
-% 3行目で、変数\texttt{s}は\texttt{String}オブジェクトのownerとなり、
-% 4行目で、ownerである\texttt{s}のスコープが終了するため\texttt{String}オブジェクトのメモリ領域が解放される。
-% % 簡単すぎる スコープがネスとしてる例があるといい 元の例は不要?
-% \begin{lstlisting}[language=Rust,caption=ownershipによるメモリ管理,label=ownership_example, captionpos=b]
-% fn main() {
-%   {
-%     let s = String::from("Hello");
-%   }
-% }
-% \end{lstlisting}
-% また、スコープがネストしている場合を
 以下の図\ref{ownership_nest_example}に示す。
 3行目で変数\texttt{s}は\texttt{Hello}という文字列を保持する\texttt{String}オブジェクトのownerとなり、
 5行目で変数\texttt{t}は\texttt{World}という文字列を保持する\texttt{String}オブジェクトのownerとなる。
@@ -242,125 +234,166 @@ Rustでは、各オブジェクトに唯一のownerが静的に定められて�
 メモリ領域が先に解放される。
 7行目で、\texttt{s}のスコープが終了するため、\texttt{World}という文字列を保持する\texttt{String}オブジェクトの
 メモリ領域が解放される。
-\begin{lstlisting}[language=Rust,caption=ownershipによるメモリ管理,label=ownership_nest_example, captionpos=b]
+\begin{lstlisting}[caption=Ownershipによるメモリ管理,label=ownership_nest_example, captionpos=b]
 fn main() {
   {
-    let s = String::from("Hello");
+    let s = String::from("Hello"); // sがStringオブジェクトのowner
     {
-      let t = String::from("World");
-    }
-  }
+      let t = String::from("World"); // tがStringオブジェクトのowner
+    } // tが指すStringオブジェクトが解放
+  } // sが指すStringオブジェクトが解放
 }
 \end{lstlisting}
 
-\subsection{move}
+\subsection{Move}
 Rustでは、変数への代入や関数に引数を渡す際にownershipが移動する。これをmoveと呼ぶ。
 変数への代入の際には以下の図\ref{move_assign_example}のようにmoveが起きる。
 2行目で、変数\texttt{s}が\texttt{String}オブジェクトのownerとなり、
-3行目でsから\texttt{new\_s}にownershipがmoveしている。
-ownershipがmoveしたことで\texttt{s}はownerでなくなるため、
+3行目で\texttt{s}から\texttt{new\_s}にownershipがmoveしている。
+Ownershipがmoveしたことで\texttt{s}はownerでなくなるため、
 4行目で\texttt{s}を利用しようとするとコンパイルエラーが発生する。
-\begin{lstlisting}[language=Rust, caption=変数への代入でmoveが起こる例,
+\begin{lstlisting}[caption=変数への代入でmoveが起こる例,
   label=move_assign_example, captionpos=b]
 fn main() {
-  let s = String::from("Hello");
-  let new_s = s;
-  s.push_str("World"); // Compile error!
+  let s = String::from("Hello"); // sがStringオブジェクトのowner
+  let new_s = s; // sからnew_sにownershipがmove
+  s.push_str("World"); // コンパイルエラー
 }    
 \end{lstlisting}
 また、関数に引数を渡す際には以下の図\ref{move_function_example}のようにmoveが起きる。
 6行目で、変数\texttt{s}が\texttt{String}オブジェクトのownerとなり、
 7行目で\texttt{s}から関数\texttt{f}の引数xにownershipがmoveしている。
-ownershipがmoveしているため、\texttt{x}は\texttt{String}オブジェクトのownerとなり、
+Ownershipがmoveしているため、\texttt{x}は\texttt{String}オブジェクトのownerとなり、
 2行目の処理を行うことができる。
 関数\texttt{f}の処理が終了した後、3行目で引数\texttt{x}の指す\texttt{String}オブジェクトが解放される。
 そのため、8行目の時点で\texttt{s}はownerでないためコンパイルエラーが発生する。
 さらに、8行目ですでに解放されている\texttt{String}オブジェクトに対して処理を行おうとしているため、
 実際に危険な処理となっている。
-\begin{lstlisting}[language=Rust, caption=関数に引数を渡す際にmoveが起こる例, 
+\begin{lstlisting}[caption=関数に引数を渡す際にmoveが起こる例, 
 label=move_function_example, captionpos=b]
 fn f(mut x: String) {
-  x.push_str("World");
-}
+  x.push_str("World"); // xはStringオブジェクトのowner
+} // xの指すStringオブジェクトが解放
 
 fn main() {
-  let mut s = String::from("Hello");
-  f(s);
-  s.push_str("Oops!"); // Danger!
+  let mut s = String::from("Hello"); // sがStringオブジェクトのowner
+  f(s); // sから関数fの引数xにownershipがmove
+  s.push_str("Oops!"); // コンパイルエラー
 }
 \end{lstlisting}
 % returnでできるけどめんどくさいよね！という振りが必要
+% TODO コードに注釈かく(moveとかも、本文に書いてある内容)
 図\ref{move_function_example}のプログラムは、以下の図\ref{move_return_function}のように
-関数fが引数xをownershipごと返却するように変更することで危険な処理を避けることができる。
-% しかし、危険な処理を避けるために、ユーザがownershipの受け渡しが正しく行われているかを確認する必要があり、
-% 不便である。
-しかし、ownershipの返却を手動で行うことは、返却を忘れてしまうと危険な処理に繋がるおそれがあり、不便である。
-\begin{lstlisting}[language=Rust, caption=危険な処理を避けた例, 
+関数fが引数xをownershipごと返却するように変更することでコンパイルエラーを発生させず実行することができる。
+% コンパイルエラーはでるよね! この書き方は面倒だよってだけ
+しかし、関数の引数にownershipがmoveするたびに
+ownershipを返却するように書くことは面倒であり不便である。
+\begin{lstlisting}[caption=危険な処理を避けた例, 
   label=move_return_function, captionpos=b]
-fn f(mut x: String) -> String{
+fn f(mut x: String) @*-> String*@{
   x.push_str("World");
-  return x
+  @*return x*@
 }
   
 fn main() {
   let mut s = String::from("Hello");
-  let mut return_s = f(s);
-  return_s.push_str("Oops!"); // Danger!
+  @*let mut return_s = *@f(s);
+  return_s.push_str("Oops!");
 }
 \end{lstlisting}
 
-\subsection{borrowing}
-% 自動でやってくれる（返却を）
-moveによって生じる不便を解消するため、
+\subsection{Borrowing}
+Moveによって生じる不便を解消するため、
 Rustにはownershipを一時的に借り、自動で返却する仕組みがある。
-ownershipを借りる行為はborrowingと呼ばれ、
+Ownershipを借りる行為はborrowingと呼ばれ、
 Rustに特有の「参照」を作成することで借りることができる。
-borrowingは、読み書き可能であるmutableなborrowingと読み取りのみ可能であるimmutableなborrowingに区別されており、
-変数名の前に\texttt{\&mut}とつけることでmutableなborroiwngが、
-\texttt{\&}とつけることでimmutableなborrowingができる。
-ownershipをborrowingしている例を以下の図\ref{borrowing_example}に示す。
+変数名の前に\texttt{\&}とつけることで、
+Rustに特有の「参照」を作成し、ownershipをborrowingできる。
+Ownershipをborrowingしている例を以下の図\ref{borrowing_example}に示す。
 6行目で、変数\texttt{s}が\texttt{String}オブジェクトのownerとなり、
 7行目で\texttt{s}のownershipが一時的に関数\texttt{f}の引数\texttt{x}に貸しだされる。
-ownershipが貸しだされているため、\texttt{x}は\texttt{String}オブジェクトのownerとなり、
+Ownershipが貸しだされているため、\texttt{x}は\texttt{String}オブジェクトのownerとなり、
 2行目の処理を行うことができる。
 関数\texttt{f}の処理が終了した後、\texttt{x}に貸しだされていたownershipは
 自動で変数\texttt{s}に返却される。
 そのため、8行目で\texttt{s}はownerであり、\texttt{s}に対して処理が可能である。
 
-\begin{lstlisting}[language=Rust, caption=borrowingの例, label=borrowing_example, captionpos=b]
+\begin{lstlisting}[caption=Borrowingの例, label=borrowing_example, captionpos=b]
 fn f(x: &String) {
-  println!("{}", &x);
-}
+  println!("{}", &x); // xはStringオブジェクトのowner
+} // sにownershipが自動で返却
 
 fn main() {
-  let mut s = String::from("Hello");
-  f(&s);
-  s.push_str("World");
+  let mut s = String::from("Hello"); // sがStringオブジェクトのowner
+  f(&s); // sのownershipが一時的に関数fの引数xに貸し出される
+  s.push_str("World"); // sはStringオブジェクトのowner
 }
 \end{lstlisting}
 
+\subsection{Mutableなborrowing}
+上で述べたborrowingは、読み取りのみ可能であるimmutableなborrowing
+であり、読み書きが可能であるmutableなborrowingも存在する。
+変数名の前に\texttt{\&mut}とつけるとmutableなborroiwngができる。
+Mutableなborrowingしている例を以下の図\ref{mutable_borrowing_example}に示す。
+6行目で、変数\texttt{s}が\texttt{String}オブジェクトのownerとなり、
+7行目で\texttt{s}のownershipが一時的に関数\texttt{f}の引数\texttt{x}に貸しだされる。
+Ownershipが貸しだされているため、\texttt{x}は\texttt{String}オブジェクトのownerとなり、
+2行目の処理を行うことができる。
+関数\texttt{f}の処理が終了した後、\texttt{x}に貸しだされていたownershipは
+自動で変数\texttt{s}に返却される。
+そのため、8行目で\texttt{s}はownerであり、\texttt{s}に対して処理が可能である。
+
+\begin{lstlisting}[caption=Mutableなborrowingの例, label=mutable_borrowing_example, captionpos=b]
+fn f(x: &@*mut*@ String) {
+  x.push_str("hoge") // xはStringオブジェクトのowner
+} // sにownershipが自動で返却
+
+fn main() {
+  let mut s = String::from("Hello"); // sがStringオブジェクトのowner
+  f(&@*mut*@ s); // sのownershipが一時的に関数fの引数xに貸し出される
+  s.push_str("World"); // sはStringオブジェクトのowner
+}
+\end{lstlisting}
+Immutableなborrowingは、すでにmutableなborrowingが起きていなければ
+複数回行うことができ、
+逆にmutableなborrowingは、すでにmutableなborrowingも
+immutableなborrowingも起きていないときにしか行うことはできない。
+
 \subsection{lifetime}
-% borrowingを自動で返すため　lifetimeは自動で推論
-borrowingによって貸し出されたownershipは、lifetimeという仕組みを利用して自動で返却される。
-lifetimeとは、参照を用いることができる範囲のことであり、基本的に自動で推論される。
-lifetimeは、以下の図\ref{lifetime_example}のように、明示的に注釈をつけることもできる。
+Borrowingによって貸し出されたownershipは、lifetimeという仕組みを利用して自動で返却される。
+Lifetimeとは、参照を用いることができる範囲のことであり、基本的に自動で推論される。
+以下の図\ref{lifetime_example2}は、lifetimeの例である。
+このとき、\texttt{s\_borrow}のライフタイムは4行目から9行目で\texttt{main}関数のスコープが終了するまで、\texttt{t\_borrow}のライフタイムは8行目から9行目で\texttt{main}関数のスコープが終了するまでであると推論される。
+% TODO lifetime 具体例(ただのブロックでも) スコープとは違う!
+\begin{lstlisting}[caption=Lifetimeの例, label=lifetime_example2, captionpos=b]
+fn main () {
+    let s = String::from("Hello");
+
+    let s_borrow = &s;
+
+    let t = String::from("World");
+
+    let t_borrow = &t;
+}
+\end{lstlisting}
+Lifetimeは、以下の図\ref{lifetime_example}のように、明示的に注釈をつけることもできる。
 1行目のように書くことで、引数xのlifetimeが関数fの本体と一致していると注釈でき、
 関数fの処理が終了したとき、xのlifetimeも終了するため、その時点でownershipが返却される。
-\begin{lstlisting}[language=Rust, caption=lifetime注釈, label=lifetime_example, captionpos=b]
-fn f<'a>(x: &'a String) {
+\begin{lstlisting}[caption=Lifetime注釈, label=lifetime_example, captionpos=b]
+fn f<'a>(x: &'a String) { // xのライフタイムと関数本体が一致
   println!("{}", &x);
 }
 
 fn main() {
-  let mut s = String::from("Hello");
-  f(&s);
-  s.push_str("World");
+  let mut s = String::from("Hello"); // sがStringオブジェクトのowner
+  f(&s); // sのownershipが一時的に関数fの引数xに貸し出される
+  s.push_str("World"); // sはStringオブジェクトのowner
 }
 \end{lstlisting}
 
 \section{Rustの参照カウント}
-% 中ではunsafe使っている
-% unsafe使えば無視できる
+% 補助的に使うのはひらがな
+後述の例のように、
 Rustの静的なownershipのみによるメモリ管理は柔軟性に欠ける場合があるため、
 Rustには\texttt{Rc} (参照カウント) オブジェクトも存在する。
 \texttt{Rc}オブジェクトはコンテナであり、中身のオブジェクトへの参照と、共通の参照カウントを持つ。
@@ -375,11 +408,11 @@ Rustには\texttt{Rc} (参照カウント) オブジェクトも存在する。
 \texttt{Rc}オブジェクト\texttt{w}の複製をランダムに10回配列に入れ、
 その配列から\texttt{Hello}という\texttt{String}オブジェクトを持つ\texttt{Rc}オブジェクトを
 削除するプログラムである。
-配列の要素は実行する度に変化するため、静的なownershipのみではメモリ管理が難しい例である。
+配列の要素は実行するたびに変化するため、静的なownershipのみではメモリ管理が難しい例である。
 12行目と16行目では\texttt{clone}関数により、\texttt{Rc}オブジェクトの複製を生成し、参照カウントが1増えている。
 20行目で\texttt{h}の複製は1つを残してすべて消滅し、\texttt{h}の参照カウントは1まで減少する。
 最後に21行目で\texttt{h}、\texttt{w}の参照カウントは0となり、中身のオブジェクトが解放される。
-\begin{lstlisting}[language=Rust, caption=Rcオブジェクトの利用例, label=rc_example, captionpos=b]
+\begin{lstlisting}[caption=Rcオブジェクトの利用例, label=rc_example, captionpos=b]
 fn remove_string(vec: &mut Vec<Rc<String>>, s: String) {
     vec.retain(|x| **x != s);
 }
@@ -391,27 +424,29 @@ fn main() {
     let mut rng = rand::thread_rng();
     for _ in 0..10 {
         if rng.gen() {
-            let h_clone = h.clone();
+            let h_clone = h.clone(); // clone関数により複製を生成
             vec.push(h_clone);
         }
         else {
-            let w_clone = w.clone();
+            let w_clone = w.clone(); // clone関数により複製を生成
             vec.push(w_clone);
         }
     }
-    remove_string(&mut vec, String::from("Hello"));
-}
+    remove_string(&mut vec, String::from("Hello")); // hの複製が消滅
+} // hとwの中身のオブジェクトが解放
 \end{lstlisting}
 
 \section{静的なfractional ownership}
-一方、Rustのownershipとは別にfractional ownershipという概念が存在する。
-fractional ownershipとは0以上かつ1以下の有理数であり、
+一方、Rustのownershipとは別にfractional ownership\cite{DBLP:conf/sas/Boyland03}
+という概念が存在する。
+Fractional ownershipとは0以上かつ1以下の有理数であり、
 オブジェクト生成時にはownershipとして1を与え、参照複製時にはownershipを分割し、
 複製された参照が消滅する際にはownershipを集約する。
 また、オブジェクトの解放にはownership 1が必要であり、
 逆にownershipが0より大きいオブジェクトはいずれ解放される必要がある。
 
 \chapter{問題点}
+% TODO ちゃんとdropできるか確認できたら
 図\ref{rc_problem}のプログラムは、
 中身に\texttt{Hello}という\texttt{String}オブジェクトを持つ
 \texttt{Rc}オブジェクト\texttt{h}と、中身に\texttt{World}という\texttt{String}オブジェクトを持つ
@@ -426,7 +461,7 @@ fractional ownershipとは0以上かつ1以下の有理数であり、
 どちらも利用していないにもかかわらず\texttt{h}のメモリ領域が確保されたままとなってしまう。
 このように、\texttt{Rc}オブジェクトを用いた場合、意図せずメモリリークが発生するおそれがある。
 % vecは使うけどhやwは使わない
-\begin{lstlisting}[language=Rust, caption=Rcオブジェクトを利用する際の問題点, label=rc_problem, captionpos=b]
+\begin{lstlisting}[caption=Rcオブジェクトを利用する際の問題点, label=rc_problem, captionpos=b]
 fn remove_string(vec: &mut Vec<Rc<String>>, s: String) {
     vec.retain(|x| **x != s);
 }
@@ -438,24 +473,24 @@ fn main() {
     let mut rng = rand::thread_rng();
     for _ in 0..10 {
         if rng.gen() {
-            let h_clone = h.clone();
+            let h_clone = h.clone(); // clone関数により複製を生成
             vec.push(h_clone);
         }
         else {
-            let w_clone = w.clone();
+            let w_clone = w.clone(); // clone関数により複製を生成
             vec.push(w_clone);
         }
     }
-    remove_string(&mut vec, String::from("Hello"));
+    remove_string(&mut vec, String::from("Hello")); // hの複製が消滅
     // その他の処理
-}
+} // hとwの中身のオブジェクトが解放
 \end{lstlisting}
 
 以下の図\ref{rc_scope_problem}のプログラムは、
 22行目で\texttt{h}と\texttt{w}のスコープが終了するため\texttt{h}のメモリ領域が解放されるため、
 図\ref{rc_problem}のような意図していないメモリリークを
 防いだプログラムである。
-\begin{lstlisting}[language=Rust, caption=メモリリークを防いだ例, 
+\begin{lstlisting}[caption=メモリリークを防いだ例, 
   label=rc_scope_problem, captionpos=b]
 fn remove_string(vec: &mut Vec<Rc<String>>, s: String) {
     vec.retain(|x| **x != s);
@@ -463,32 +498,32 @@ fn remove_string(vec: &mut Vec<Rc<String>>, s: String) {
   
 fn main() {
     let mut vec: Vec<Rc<String>> = Vec::new();
-    {
+    @*{*@
       let h = Rc::new(String::from("Hello"));
       let w = Rc::new(String::from("World"));
       let mut rng = rand::thread_rng();
       for _ in 0..10 {
           if rng.gen() {
-              let h_clone = h.clone();
+              let h_clone = h.clone(); // clone関数により複製を生成
               vec.push(h_clone);
           }
           else {
-              let w_clone = w.clone();
+              let w_clone = w.clone(); // clone関数により複製を生成
               vec.push(w_clone);
           }
-      }
+      } 
       remove_string(&mut vec, String::from("Hello"));
-    }
+    @*}*@ // hの中身のオブジェクトが解放
     // その他の処理
 }
 \end{lstlisting}
-
-しかし、図\ref{rc_miss_problem}のように、スペルミスにより\texttt{Hello}ではなく\texttt{Hell}という文字列を持つ
+% 変わった部分太字にできる?
+しかし、例えば図\ref{rc_miss_problem}のように、スペルミスにより\texttt{Hello}ではなく\texttt{Hell}という文字列を持つ
 \texttt{String}オブジェクトを削除してしまった場合、
 21行目で配列から\texttt{Hello}という文字列を保持する\texttt{String}オブジェクトが削除されず、
 22行目で\texttt{h}のメモリ領域が解放されないため
 メモリリークが起きてしまう。
-\begin{lstlisting}[language=Rust, caption=Rcオブジェクトを利用する際の問題点, 
+\begin{lstlisting}[caption=ユーザのミスによるメモリリーク, 
   label=rc_miss_problem, captionpos=b]
 fn remove_string(vec: &mut Vec<Rc<String>>, s: String) {
     vec.retain(|x| **x != s);
@@ -502,42 +537,75 @@ fn main() {
       let mut rng = rand::thread_rng();
       for _ in 0..10 {
           if rng.gen() {
-              let h_clone = h.clone();
+              let h_clone = h.clone(); // clone関数により複製を生成
               vec.push(h_clone);
           }
           else {
-              let w_clone = w.clone();
+              let w_clone = w.clone(); // clone関数により複製を生成
               vec.push(w_clone);
           }
       }
-      remove_string(&mut vec, String::from("Hell"));
-    }
+      remove_string(&mut vec, String::from(@*"Hell"*@)); // スペルミス
+    } // hもwもどちらも中身のオブジェクトは解放されない
     // その他の処理
 }
 \end{lstlisting}
-このように、ユーザが意識すればメモリリークを防ぐことも可能ではあるが、
-メモリリークが起きないことを保障することはできないため、
-ユーザのミスにより意図していないメモリリークがおきてしまうことがあり得る。
+% 参照カウントだと、ミスが起こりやすい
+% 静的検査が望ましいがない、せめて動的検査があってほしい
+% into_inner入れればできるが、忘れたらいけない
 
-% スコープ付ければいける?
-% 保障はしてくれないからしたいよね
-% もしもremove_stringのスペルミスしたら？
+% ここは実装の部分に移す
+\texttt{RC}オブジェクトの中身のオブジェクトを取り出す
+\texttt{into\_inner}関数を用いることで、
+図\ref{rc_problem}のプログラムは以下の図\ref{rc_random}のように、
+メモリリークが起きないように表すことができる。
+22行目の部分で、複製が消滅した後、23行目で\texttt{into\_inner}関数
+により中身のオブジェクトを取り出している。
+複製が消滅していなければ、\texttt{into\_inner}を用いる際にエラーが起きるため、意図していないメモリリークを防ぐことができる。
+しかし、\texttt{into\_inner}関数により中身のオブジェクトを取り出すことを忘れてしまうと、メモリリークが発生してしまう。
+\begin{lstlisting}[caption=into\_inner関数を用いた例, 
+  label=rc_random, captionpos=b]
+fn remove_string(vec: &mut Vec<Rc<String>>, s: String) {
+    vec.retain(|x| **x != s);
+}
+
+fn main() {
+    let mut vec: Vec<Rc<String>> = Vec::new();
+    let h = String::from("Hello");
+    let w = String::from("World");
+    let mut rng = rand::thread_rng();
+    let h_immut = Rc::new(h);
+    let w_immut = Rc::new(w);
+    for _ in 0..10 {
+        if rng.gen() {
+            let h_clone = h_immut.clone();
+            vec.push(h_clone);
+        }
+        else {
+            let w_clone = w_immut.clone();
+            vec.push(w_clone);
+        }
+    }
+    remove_string(&mut vec, String::from("Hello"));
+    let mut h_mut = Rc::into_inner(h_immut).unwrap(); // into_inner
+    // その他の処理
+}
+\end{lstlisting}
+
+このように、\texttt{Rc}オブジェクトを用いた場合、
+ユーザによるミスが起こりやすく、結果としてメモリリークが起きる場合がある。
+現在、Rustでこのようなメモリリークが起きないことは静的に検査する手段が存在しないだけでなく、
+動的に検査する手段も存在していない。
 
 \chapter{本研究の提案}
 本研究では、Rustの静的なownershipによるメモリ管理と、
 動的な参照カウントの柔軟性を組み合わせた新たな参照オブジェクトを提案する。
 この参照オブジェクトは、fractional ownershipの考え方を取り入れている。
 
-% 新しい3.1
-% 解決するために、こういう風に使える参照カウントを提案3.7
-% エラーの例も入れよう
-% スペルミスしてもエラー出るよ！
-
-% その後に詳しい使い方の説明
-
 \section{提案するインターフェース}
-\texttt{Rc}オブジェクトを用いた際に、メモリリークが起き得るという問題を解決するために、
-以下の図\ref{random_example}のように用いることができる参照カウントを提案する。
+\texttt{Rc}オブジェクトを用いた際に、メモリリークが起きやすく検出しづらい
+という問題を解決するために、
+以下の図\ref{random_example}のように用いることができる参照オブジェクトを提案する。
 このプログラムは、中身に\texttt{Hello}という\texttt{String}オブジェクトを持つ
 mutableな参照オブジェクト\texttt{h}と、中身に\texttt{World}という\texttt{String}オブジェクトを持つ
 mutableな参照オブジェクト\texttt{w}をどちらもimmutableな参照オブジェクトに変換した後、
@@ -547,80 +615,84 @@ mutableな参照オブジェクト\texttt{w}をどちらもimmutableな参照オ
 7、8行目で生成したmutableな参照を、10、11行目でimmutableな参照に変換し、
 14、19行目でimmutableな参照を複製している。
 \texttt{remove\_string}が終了した後、26行目、32行目でmutableな参照に戻している。
-\begin{lstlisting}[language=Rust, caption=新たな参照オブジェクトを用いた柔軟なメモリ管理の例, 
+\begin{lstlisting}[caption=新たな参照オブジェクトを用いた柔軟なメモリ管理の例, 
   label=random_example, captionpos=b]
-fn remove_string(vec: &mut Vec<RefImmut<String>>, s: String) {
+fn remove_string(vec: &mut Vec<NewRefImmut<String>>, s: String) {
     vec.retain(|x| **x != s);
 }
 
 fn main() {
-    let mut vec: Vec<RefImmut<String>> = Vec::new();
-    let mut h = RefMut::new(String::from("Hello"));
-    let mut w = RefMut::new(String::from("World"));
+    let mut vec: Vec<NewRefImmut<String>> = Vec::new();
+    let mut h = NewRefMut::new(String::from("Hello")); // Mutableな参照
+    let mut w = NewRefMut::new(String::from("World")); // Mutableな参照
     let mut rng = rand::thread_rng();
-    let h_immut = h.to_immut();
-    let w_immut = w.to_immut();
+    let h_immut = h.to_immut(); // Mutableからimmutableへ変換
+    let w_immut = w.to_immut(); // Mutableからimmutableへ変換
     for _ in 0..10 {
         if rng.gen() {
-            let h_immut1 = h_immut.clone_immut();
+            let h_immut1 = h_immut.clone_immut(); 参照の複製
             println!("{}", h_immut1);
             vec.push(h_immut1);
         }
         else {
-            let w_immut1 = w_immut.clone_immut();
+            let w_immut1 = w_immut.clone_immut(); 参照の複製
             println!("{}", w_immut1);
             vec.push(w_immut1);
         }
     }
 
     remove_string(&mut vec, String::from("Hello"));
-    let mut h_mut = h_immut.back_to_mut();
+    let mut h_mut = h_immut.back_to_mut(); // Immutableからmutableへ
     h_mut.push_str("hoge");
     println!("{}", h_mut);
     drop(h_mut);
 
     drop(vec);
-    let mut w_mut = w_immut.back_to_mut();
+    let mut w_mut = w_immut.back_to_mut(); // Immutableからmutableへ
 }
 \end{lstlisting}
+% コードにコメント、本文で~行目とか入れて説明
 この参照オブジェクトは、読み書き可能であるmutableな参照オブジェクトと
 読み取りのみ可能であるimmutableな参照オブジェクトの2つがあり、静的に区別されている。
-mutableな参照はRustの通常のownershipに従い、同時に一つしか存在しない。
-\texttt{to\_immut}関数を用いると、mutableな参照をimmutableな参照に変換でき、
+Mutableな参照はRustの通常のownershipに従い、同時に一つしか存在しない。
+Mutableな参照は、7、8行目のように\texttt{new}関数により生成できる。
+10、11行目のように\texttt{to\_immut}関数を用いると、mutableな参照をimmutableな参照に変換でき、
 その際Rustの静的なownershipのmoveによりmutableな参照は消滅する。
-immutableな参照は、Rustの通常のownershipに違反して\texttt{clone\_immut}関数により複製が可能であり、
+14、19行目のように、
+Immutableな参照は、Rustの通常のownershipに違反して\texttt{clone\_immut}関数により複製が可能であり、
 複製の数を動的にカウントする。
+26、32行目のように、
 参照カウントが1つであるときのみ、
 \texttt{back\_to\_immut}関数を用いてimmutableな参照からmutableな参照へ変換でき、
 その際moveによりimmutableな参照は消滅する。
-immutableな参照からmutableな参照に戻し忘れると、実行時エラーが発生するため、
+Immutableな参照からmutableな参照に戻し忘れると、実行時エラーが発生するため、
 オブジェクトの解放し忘れが検出できる。
 
 以下の図\ref{error_example1}は、図\ref{random_example}とほぼ同じプログラムであるが、
 immutableな参照をmutableな参照に戻していないプログラムである。
-この場合、mutableな参照に戻さないまま参照が消滅してしまっているため実行時エラーが発生し、
+この場合、mutableな参照に戻さないまま参照が消滅してしまっているため以下の図\ref{error_result1}のように実行時エラーが発生し、
 オブジェクトの解放し忘れを検出することができる。
-\begin{lstlisting}[language=Rust, caption=オブジェクトの解放し忘れを検出する例, 
+\begin{lstlisting}[caption=オブジェクトの解放し忘れを検出する例, 
   label=error_example1, captionpos=b]
-fn remove_string(vec: &mut Vec<RefImmut<String>>, s: String) {
+fn remove_string(vec: &mut Vec<NewRefImmut<String>>, s: String) {
     vec.retain(|x| **x != s);
 }
 
 fn main() {
-    let mut vec: Vec<RefImmut<String>> = Vec::new();
-    let mut h = RefMut::new(String::from("Hello"));
-    let mut w = RefMut::new(String::from("World"));
+    let mut vec: Vec<NewRefImmut<String>> = Vec::new();
+    let mut h = NewRefMut::new(String::from("Hello")); // Mutableな参照
+    let mut w = NewRefMut::new(String::from("World")); // Mutableな参照
     let mut rng = rand::thread_rng();
-    let h_immut = h.to_immut();
-    let w_immut = w.to_immut();
+    let h_immut = h.to_immut(); // Mutableからimmutableへ変換
+    let w_immut = w.to_immut(); // Mutableからimmutableへ変換
     for _ in 0..10 {
         if rng.gen() {
-            let h_immut1 = h_immut.clone_immut();
+            let h_immut1 = h_immut.clone_immut(); // 参照の複製
             println!("{}", h_immut1);
             vec.push(h_immut1);
         }
         else {
-            let w_immut1 = w_immut.clone_immut();
+            let w_immut1 = w_immut.clone_immut(); // 参照の複製
             println!("{}", w_immut1);
             vec.push(w_immut1);
         }
@@ -629,21 +701,44 @@ fn main() {
     remove_string(&mut vec, String::from("Hello"));
 } // error!
 \end{lstlisting}
+\begin{lstlisting}[caption=オブジェクトの解放し忘れのエラー, 
+  label=error_result1, captionpos=b]
+$ cargo run
+   Compiling dynamic_error_example2 v0.1.0 
+    (/home/baba/experiment-report/202401/0105/dynamic_error_example2)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.94s
+     Running `target/debug/dynamic_error_example2`
+Hello
+World
+Hello
+World
+Hello
+Hello
+Hello
+World
+World
+World
+thread 'main' panicked at /home/baba/experiment-report/202401/0105
+    /dynamic_error_example2/src/lib.rs:154:17:
+cannot drop
+note: run with `RUST_BACKTRACE=1` 
+    environment variable to display a backtrace
+\end{lstlisting}
 
 以下の図\ref{error_example2}は、図\ref{random_example}とほぼ同じプログラムであるが、
 参照カウントが1でないにも関わらずimmutableな参照をmutableな参照に戻そうとしているプログラムである。
-この場合、mutableな参照に戻すことができずに実行時エラーが発生するため、
+この場合、mutableな参照に戻すことができずに以下の図\ref{error_result2}のような実行時エラーが発生するため、
 mutableな参照でないと消滅させることはできないようユーザに強制することができている。
-\begin{lstlisting}[language=Rust, caption=mutableな参照へ戻せないことを検出する例, 
+\begin{lstlisting}[caption=Mutableな参照へ戻せないことを検出する例, 
   label=error_example2, captionpos=b]
-fn remove_string(vec: &mut Vec<RefImmut<String>>, s: String) {
+fn remove_string(vec: &mut Vec<NewRefImmut<String>>, s: String) {
     vec.retain(|x| **x != s);
 }
 
 fn main() {
-    let mut vec: Vec<RefImmut<String>> = Vec::new();
-    let mut h = RefMut::new(String::from("Hello"));
-    let mut w = RefMut::new(String::from("World"));
+    let mut vec: Vec<NewRefImmut<String>> = Vec::new();
+    let mut h = NewRefMut::new(String::from("Hello"));
+    let mut w = NewRefMut::new(String::from("World"));
     let mut rng = rand::thread_rng();
     let h_immut = h.to_immut();
     let w_immut = w.to_immut();
@@ -666,21 +761,44 @@ fn main() {
     println!("{}", w_mut);
 }
 \end{lstlisting}
+\begin{lstlisting}[caption=Mutableな参照に戻し忘れた際のエラー, 
+  label=error_result2, captionpos=b]
+$ cargo run
+   Compiling dynamic_error_example v0.1.0
+    (/home/baba/experiment-report/202401/0105/dynamic_error_example)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.98s
+     Running `target/debug/dynamic_error_example`
+Hello
+Hello
+Hello
+World
+Hello
+Hello
+World
+World
+World
+Hello
+thread 'main' panicked at /home/baba/experiment-report/202401/0105
+    /dynamic_error_example/src/lib.rs:72:17:
+cannot back to mut
+note: run with `RUST_BACKTRACE=1` 
+    environment variable to display a backtrace
+\end{lstlisting}
 
 以下の図\ref{error_example3}は、図\ref{random_example}とほぼ同じプログラムであるが、
 文字列を削除する際にスペルミスをしてしまっているプログラムである。
-この場合、mutableな参照に戻すことができずに実行時エラーが発生するため、
+この場合、mutableな参照に戻すことができずに以下の図\ref{error_result3}実行時エラーが発生するため、
 メモリリークを防ぐことができている。
-\begin{lstlisting}[language=Rust, caption=mutableな参照へ戻せないことを検出する例, 
+\begin{lstlisting}[caption=ユーザのミスを検出する例, 
   label=error_example3, captionpos=b]
-  fn remove_string(vec: &mut Vec<RefImmut<String>>, s: String) {
+  fn remove_string(vec: &mut Vec<NewRefImmut<String>>, s: String) {
     vec.retain(|x| **x != s);
 }
 
 fn main() {
-    let mut vec: Vec<RefImmut<String>> = Vec::new();
-    let mut h = RefMut::new(String::from("Hello"));
-    let mut w = RefMut::new(String::from("World"));
+    let mut vec: Vec<NewRefImmut<String>> = Vec::new();
+    let mut h = NewRefMut::new(String::from("Hello"));
+    let mut w = NewRefMut::new(String::from("World"));
     let mut rng = rand::thread_rng();
     let h_immut = h.to_immut();
     let w_immut = w.to_immut();
@@ -709,20 +827,54 @@ fn main() {
     let mut w_mut = w_immut.back_to_mut();
 }
 \end{lstlisting}
+\begin{lstlisting}[caption=ユーザのミスによるエラー, 
+  label=error_result3, captionpos=b]
+$ cargo run
+   Compiling random v0.1.0 
+    (/home/baba/experiment-report/202401/0105/random)
+warning: unused variable: `w_new`
+  --> src/main.rs:39:9
+   |
+39 |     let w_new = w_immut.back_to_mut();
+   |         ^^^^^ help: if this is intentional,
+    prefix it with an underscore: `_w_new`
+   |
+   = note: `#[warn(unused_variables)]` on by default
+
+warning: `random` (bin "random") generated 1 warning 
+    (run `cargo fix --bin "random"` to apply 1 suggestion)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.67s
+     Running `target/debug/random`
+Hello
+Hello
+Hello
+World
+World
+World
+Hello
+Hello
+Hello
+Hello
+thread 'main' panicked at /home/baba/experiment-report/202401/0105
+    /random/src/lib.rs:72:17:
+cannot back to mut
+note: run with `RUST_BACKTRACE=1` 
+    environment variable to display a backtrace
+\end{lstlisting}
 
 \section{実装}
-mutableな参照オブジェクト、immutableな参照オブジェクトは以下の図\ref{struct_implementation}のように実装した。
-mutableな参照オブジェクトは、オブジェクトを保持するコンテナとして実装した。
-immutableな参照オブジェクトは、
+Mutableな参照オブジェクト、immutableな参照オブジェクトは以下の図\ref{struct_implementation}のように実装した。
+Mutableな参照オブジェクトは、オブジェクトを保持するコンテナとして実装した。
+Immutableな参照オブジェクトは、
 Rustのownershipを無視する特別なポインタであるNonNullオブジェクトを保持するオブジェクトとして実装した。
 NonNullオブジェクトにより、参照の複製が可能になる。
-immutableな参照内のポインタはNewRefInnerオブジェクトへのポインタであり、
+Immutableな参照内のポインタはNewRefInnerオブジェクトへのポインタであり、
 このオブジェクトは参照カウントと中身のオブジェクトを保持する。
-\begin{lstlisting}[language=Rust, caption=新たな参照オブジェクトの実装, label=struct_implementation, captionpos=b]
-pub struct RefMut<T: ?Sized> {
+\begin{lstlisting}[caption=新たな参照オブジェクトの実装, label=struct_implementation, captionpos=b]
+pub struct NewRefMut<T: ?Sized> {
     data: T,
 }
-pub struct RefImmut<T: ?Sized> {
+pub struct NewRefImmut<T: ?Sized> {
     ptr: NonNull<NewRefInner<T>>
 }
 struct NewRefInner<T: ?Sized> {
@@ -731,16 +883,16 @@ struct NewRefInner<T: ?Sized> {
 }
 \end{lstlisting}
 
-mutableな参照オブジェクトを生成する\texttt{new}関数とmutableな参照オブジェクトを引数として受け取り、
+Mutableな参照オブジェクトを生成する\texttt{new}関数とmutableな参照オブジェクトを引数として受け取り、
 immutableな参照オブジェクトに変換して返す\texttt{to\_immut}関数は
 以下の図\ref{new_to_implementation}ように実装した。
 4行目で\texttt{to\_immut}関数の引数は、borrowingでなくmoveが起きるようにすることで、
 変換した後引数のmutableな参照が消滅するように実装した。
-\begin{lstlisting}[language=Rust, caption=関数newと関数to\_immutの実装, label=new_to_implementation, captionpos=b]
-pub fn new(data: T) -> RefMut<T> {
+\begin{lstlisting}[caption=関数newと関数to\_immutの実装, label=new_to_implementation, captionpos=b]
+pub fn new(data: T) -> NewRefMut<T> {
     Self { data: data }
 }
-pub fn to_immut(self: RefMut<T>) -> RefImmut<T> {
+pub fn to_immut(self: NewRefMut<T>) -> NewRefImmut<T> { // Moveにより消滅
     let mut this = ManuallyDrop::new(self);
     let inner =
         unsafe{ptr::read(Self::get_mut_unchecked(&mut this))};
@@ -748,33 +900,34 @@ pub fn to_immut(self: RefMut<T>) -> RefImmut<T> {
         ref_count: AtomicUsize::new(1),
         data: inner,
     });
-    RefImmut {ptr: Box::leak(x).into()}
+    NewRefImmut {ptr: Box::leak(x).into()}
 }
 \end{lstlisting}
 
-immutableな参照オブジェクトを引数として受け取り、
+Immutableな参照オブジェクトを引数として受け取り、
 複製した参照を返す\texttt{clone\_immut}関数は次の図\ref{clone_implementation}ように実装した。
 \texttt{clone\_immut}関数の引数をborrowingにすることで、複製元の参照が消滅せずに利用できるように実装した。
 また、2行目の\texttt{fetch\_add}関数によってimmutableな参照の内部の参照カウントが1増加するように実装した。
-\begin{lstlisting}[language=Rust, caption=関数clone\_immutの実装, label=clone_implementation, captionpos=b]
-pub fn clone_immut(&self: &RefImmut<T>) -> RefImmut<T> {
+\begin{lstlisting}[caption=関数clone\_immutの実装, label=clone_implementation, captionpos=b]
+pub fn clone_immut(&self: &NewRefImmut<T>) -> NewRefImmut<T>
+{ // Borrowing
     let old_size = self.inner().ref_count.fetch_add(1, Release);
     if old_size > MAX_REFCOUNT {
         abort();
     }
-    RefImmut { ptr: self.ptr }
+    NewRefImmut { ptr: self.ptr }
 }
 \end{lstlisting}
 
-immutableな参照オブジェクトを引数として受け取り、
+Immutableな参照オブジェクトを引数として受け取り、
 mutableな参照オブジェクトに変換し返す\texttt{back\_to\_mut}関数は
 次の図\ref{back_implementation}のように実装した。
 \texttt{back\_to\_mut}関数の引数をborowwingでなくmoveするようにし、
 変換した後引数のimmutableな参照が消滅するように実装した。
 また、2行目でimmutableな参照の参照カウントが1でなければ実行時エラーが起きるようにし、
 immutableな参照のままでは消滅できないように実装した。
-\begin{lstlisting}[language=Rust, caption=関数back\_to\_mutの実装, label=back_implementation, captionpos=b]
-pub fn back_to_mut(self: RefImmut<T>) -> RefMut<T> {
+\begin{lstlisting}[caption=関数back\_to\_mutの実装, label=back_implementation, captionpos=b]
+pub fn back_to_mut(self: NewRefImmut<T>) -> NewRefMut<T> { // Move
     if self.inner().ref_count.load(Acquire) != 1{
         panic!("cannot back to mut");
     }
@@ -785,19 +938,19 @@ pub fn back_to_mut(self: RefImmut<T>) -> RefMut<T> {
         dealloc(this.ptr.cast().as_mut(), 
         Layout::for_value_raw(this.ptr.as_ptr()))
     }
-    RefMut { data: inner }
+    NewRefMut { data: inner }
 }
 \end{lstlisting}
 
-immutableな参照を引数として受け取り、
+Immutableな参照を引数として受け取り、
 その参照を消滅させる\texttt{drop}関数は以下の図\ref{drop_implementation}のように実装した。
 参照カウントが2以上である場合は、参照カウントを1減少させ、
 参照カウントが1である場合は実行時エラーが起きるようにすることで、
 immutableな参照をmutableな参照に戻さずに消滅できなように実装した。
 これにより、オブジェクトの解放し忘れを検出することが可能である。
-\begin{lstlisting}[language=Rust, caption=関数back\_to\_mutの実装, label=drop_implementation, captionpos=b]
+\begin{lstlisting}[caption=関数back\_to\_mutの実装, label=drop_implementation, captionpos=b]
 fn drop(&mut self) {
-    let count = self.inner().ref_count.fetch_sub(1, Relaxed);
+    let count = self.inner().ref_count.fetch_sub(1, Relaxed); // カウント減少
     if count > 1{
         return
     }
@@ -817,45 +970,6 @@ fn drop(&mut self) {
 }
 \end{lstlisting}
 
-% ここは実装の部分に移す
-新たな参照オブジェクトを用いた図\ref{random_example}は、
-\texttt{Rc}オブジェクトを用いることで以下の図\ref{rc_random}のように表すことができる。
-つまり本研究の参照オブジェクトは、単に\texttt{Rc}オブジェクトの使い方を強制するオブジェクトである。
-しかし、本研究の新たな参照オブジェクトを用いることで、意図していないメモリリークが起きているかどうかを
-実行時エラーによって検出でき、ユーザはメモリリークを意識せずにプログラムを書くことができる。
-これは、\texttt{Rc}オブジェクトを用いる場合と異なる点であり、
-新たな参照オブジェクトを利用するメリットである。
-\begin{lstlisting}[language=Rust, caption=新たな参照オブジェクトを用いた並列処理の例, 
-  label=rc_random, captionpos=b]
-fn remove_string(vec: &mut Vec<Rc<String>>, s: String) {
-    vec.retain(|x| **x != s);
-}
-
-fn main() {
-    let mut vec: Vec<Rc<String>> = Vec::new();
-    let h = String::from("Hello");
-    let w = String::from("World");
-    let mut rng = rand::thread_rng();
-    let h_immut = Rc::new(h);
-    let w_immut = Rc::new(w);
-    for _ in 0..10 {
-        if rng.gen() {
-            let h_clone = h_immut.clone();
-            vec.push(h_clone);
-        }
-        else {
-            let w_clone = w_immut.clone();
-            vec.push(w_clone);
-        }
-    }
-    remove_string(&mut vec, String::from("Hello"));
-    let mut h_mut = Rc::into_inner(h_immut).unwrap();
-    h_mut.push_str("hoge");
-    println!("{}", h_mut);
-    drop(h_mut);
-}
-\end{lstlisting}
-
 \chapter{並列処理への応用}
 静的なownershipで柔軟性に欠ける例として、並列処理の例があり、本研究の新たな参照オブジェクトを応用できる。
 
@@ -865,11 +979,11 @@ fn main() {
 Rustの通常のスレッド生成では、ownerは高々一つのスレッドにmoveし、
 複数のスレッドにmoveすることはできない。以下の図\ref{thread_example}は、
 Rustで通常のスレッドを生成する例であり、3行目にある\texttt{move}キーワードによりmoveが起きる。
-\begin{lstlisting}[language=Rust, caption=Rustでの通常のスレッド生成の例, 
+\begin{lstlisting}[caption=Rustでの通常のスレッド生成の例, 
   label=thread_example, captionpos=b]
 fn main() {
     let s = String::from("Hello");
-    thread::spawn(move || {
+    thread::spawn(move || { // sがスレッドにmove
         println!("{}", s);
     });
 }
@@ -877,6 +991,25 @@ fn main() {
 
 Rustでは、スレッドのライフタイムは無限とみなされており、スレッドが合流した際にownershipが返却されないため、
 共有オブジェクトに対するborrowingは不可能である。
+以下の図\ref{thread_borrow_example}は、
+Rustで通常のスレッドで共有オブジェクトに対して
+borrowingをしようとしている例である。
+4、7行目でborrowingを行っているが、
+9、10行目でownershipが返却されず、コンパイルエラーとなる。
+\begin{lstlisting}[caption=通常のスレッドでborrowingができない例, 
+  label=thread_borrow_example, captionpos=b]
+fn main() {
+    let s = String::from("Hello");
+    let t1 = thread::spawn(|| {
+        println!("{}", &s); // コンパイルエラー
+    });
+    let t2 = thread::spawn(|| {
+        println!("{}", &s); // コンパイルエラー
+    });
+    t1.join(); // Ownershipが返却されない
+    t2.join(); // Ownershipが返却されない
+}
+\end{lstlisting}
 
 \subsection{scoped thread}
 共有オブジェクトに対するborrowingができないことは不便であるため、
@@ -885,17 +1018,17 @@ Rustにはスレッドをまたいだborrowingを可能にするscoped threadが
 共有オブジェクトに対するborrowingが可能となる。
 以下の図\ref{scoped_thread_example}は、scoped threadを利用した例である。
 スレッドに付与されたスコープは、10行目で終了しスレッドの合流が起こる。
-\begin{lstlisting}[language=Rust, caption=scoped threadの例, label=scoped_thread_example, captionpos=b]
+\begin{lstlisting}[caption=scoped threadの例, label=scoped_thread_example, captionpos=b]
 fn main () {
     let mut s = String::from("Hello");
-    thread::scope(|sc| {
+    thread::scope(|sc| { // scがスコープ
         sc.spawn(|| {
             println!("{}", &s);
         });
         sc.spawn(|| {
             println!("{}", &s);
         });
-    });
+    }); // スコープが終了し、スレッドが合流
     s.push_str("World");
 }
 \end{lstlisting}
@@ -907,7 +1040,7 @@ fn main () {
 このプログラムは、関数\texttt{my\_spawn}により\texttt{main}関数外で生成したスレッドが
 \texttt{main}関数内で合流するというプログラムである。
 このプログラムは、スレッドの合流が静的スコープに従っていないため、scoped threadで表すことができない。
-\begin{lstlisting}[language=Rust, caption=scoped threadで表せない例, 
+\begin{lstlisting}[caption=scoped threadで表せない例, 
   label=scoped_thread_problem, captionpos=b]
 fn my_spawn (a: &String) -> JoinHandle<()>{
     let t = thread::spawn(|| {
@@ -924,13 +1057,8 @@ fn main() {
     a.push_str(“World”);
 }
 \end{lstlisting}
-Rustには、Readers-Writer Lock\cite{DBLP:journals/cacm/CouroisHP71}がある。
-これは、複数の読み取りは許すが書き込みのアクセスの際は排他的な場合のみ許すロックである。
-しかし、Readers-Writer Lockを用いた際には本研究の参照オブジェクトと異なり、
-不要なロックが発生するおそれがある。
 
-
-\section{新たな参照オブジェクトの応用}
+\section{我々の提案の応用}
 スレッドの合流が静的スコープに従わない並列処理は、
 本研究の新たな参照オブジェクトにより以下の図\ref{scoped_example}のように表すことができる。
 関数\texttt{my\_spawn}は、引数として\texttt{String}オブジェクトへのimmutableな参照を受け取り、
@@ -942,33 +1070,38 @@ Rustには、Readers-Writer Lock\cite{DBLP:journals/cacm/CouroisHP71}がある�
 13、14行目で\texttt{main}関数内でスレッドが合流している。
 その後関数\texttt{drop}によりownershipの集約が起き、
 関数\texttt{back\_to\_mut}によりmutableな参照に戻している。
-\begin{lstlisting}[language=Rust, caption=新たな参照オブジェクトを用いた並列処理の例, 
+\begin{lstlisting}[caption=新たな参照オブジェクトを用いた並列処理の例, 
   label=scoped_example, captionpos=b]
-fn my_spawn (a: &RefImmut<String>) -> JoinHandle<()>{
+fn my_spawn (a: &NewRefImmut<String>) -> JoinHandle<()>{
     let t = thread::spawn(||{
         println!("{}", a);
     });
     return t
 }
 fn main() {
-    let mut s = RefMut::new(String::from("Hello"));
-    let s1 = s.to_immut();
-    let s2 = s1.clone_immut(); 
+    let mut s = NewRefMut::new(String::from("Hello")); // 参照生成
+    let s1 = s.to_immut(); // Mutableからimmutableへ変換
+    let s2 = s1.clone_immut(); // 参照の複製
     let t1 = my_spawn(&s1);
     let t2 = my_spawn(&s2); 
     t1.join();
     t2.join();
     drop(s2);
-    let mut s3 = s1.back_to_mut();
+    let mut s3 = s1.back_to_mut(); // Immutableからmutableへ変換
     s3.push_str("World");
 }
 \end{lstlisting}
 
+\subsection{Readers-Writer Lock}
+Rustには、Readers-Writer Lock\cite{DBLP:journals/cacm/CouroisHP71}がある。
+これは、複数の読み取りは許すが書き込みのアクセスの際は排他的な場合のみ許すロックである。
+しかし、Readers-Writer Lockを用いた際には本研究の参照オブジェクトと異なり、
+不要なロックが発生するおそれがある。
+% もう少し詳しく、subsectionにしてもよい 具体例とか入れる
+
 \chapter{関連研究}
-% TODO 本研究とは何が違うか(静的、動的の違い)
 本研究で取り入れた、fractional ownership\cite{DBLP:conf/sas/Boyland03}は、
 有理数計画法を用いて静的に検査されている。
-% TODO 本研究とは何が違うか(静的、動的の違い)
 また、RustでなくC言語の特定のプログラムでメモリ関連のエラーがないことが
 fractional ownershipにより検証されている\cite{10.1007/978-3-642-10672-9_11}。
 また、fractional ownershipとRustの静的なownershipを組み合わせた新たな所有権型が提案されており、
@@ -986,23 +1119,17 @@ RustBeltによってメモリ安全であることが証明されている。
 本研究の参照オブジェクトがメモリ安全であるかは、RustBeltを用いて新たに証明する必要があった。
 
 \chapter{結論と今後の課題}
-fractional ownershipの考え方を取り入れ、Rustの静的なownershipによるメモリ管理と、
+Fractional ownershipの考え方を取り入れ、Rustの静的なownershipによるメモリ管理と、
 動的な参照カウントの柔軟性を組み合わせた新たな参照オブジェクトを提案した。
 この参照オブジェクトにより、オブジェクトの解放し忘れを実行時に検出し、メモリリークを防ぐことができる。
 今後の課題は、新たな参照オブジェクトがメモリ安全であることを証明することが挙げられる。
-また、新たな参照オブジェクトをより具体的な例で利用し、どれほどメモリリークを防ぐことができたかを計測することも
+また、新たな参照オブジェクトをより具体的な例で利用し、どれほどメモリリークを防ぐことができたかを実験することも
 挙げられる。
 
-% 代わりに実例で試す
-% 使い勝手の確認　どのくらいメモリリーク防げた?
 \backmatter% ここから後付
 
 % dblpで確認してみる
 % % %% 参考文献: bibtex
-% \cite{10.1007/3-540-44898-5_4}
-% \cite{10.1145/3158154}
-% \cite{10.1007/978-3-642-10672-9_11}
-% \cite{10.1007/978-3-031-50521-8_11}
 \bibliographystyle{junsrt}
 \bibliography{refs}
 

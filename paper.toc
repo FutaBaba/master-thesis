@@ -5,22 +5,24 @@
 \contentsline {section}{\numberline {1.3}本論文の構成}{1}%
 \contentsline {chapter}{\numberline {第2章}背景}{2}%
 \contentsline {section}{\numberline {2.1}Rustのownership}{2}%
-\contentsline {subsection}{\numberline {2.1.1}ownership}{2}%
-\contentsline {subsection}{\numberline {2.1.2}move}{2}%
-\contentsline {subsection}{\numberline {2.1.3}borrowing}{4}%
-\contentsline {subsection}{\numberline {2.1.4}lifetime}{4}%
-\contentsline {section}{\numberline {2.2}Rustの参照カウント}{5}%
-\contentsline {section}{\numberline {2.3}静的なfractional ownership}{6}%
-\contentsline {chapter}{\numberline {第3章}問題点}{7}%
-\contentsline {chapter}{\numberline {第4章}本研究の提案}{10}%
-\contentsline {section}{\numberline {4.1}提案するインターフェース}{10}%
-\contentsline {section}{\numberline {4.2}実装}{14}%
-\contentsline {chapter}{\numberline {第5章}並列処理への応用}{18}%
-\contentsline {section}{\numberline {5.1}Rustの並列処理}{18}%
-\contentsline {subsection}{\numberline {5.1.1}通常のスレッド}{18}%
-\contentsline {subsection}{\numberline {5.1.2}scoped thread}{18}%
-\contentsline {section}{\numberline {5.2}並列処理の際の問題点}{19}%
-\contentsline {section}{\numberline {5.3}新たな参照オブジェクトの応用}{20}%
-\contentsline {chapter}{\numberline {第6章}関連研究}{21}%
-\contentsline {chapter}{\numberline {第7章}結論と今後の課題}{22}%
-\contentsline {chapter}{参考文献}{23}%
+\contentsline {subsection}{\numberline {2.1.1}Ownership}{2}%
+\contentsline {subsection}{\numberline {2.1.2}Move}{2}%
+\contentsline {subsection}{\numberline {2.1.3}Borrowing}{4}%
+\contentsline {subsection}{\numberline {2.1.4}Mutableなborrowing}{4}%
+\contentsline {subsection}{\numberline {2.1.5}lifetime}{5}%
+\contentsline {section}{\numberline {2.2}Rustの参照カウント}{6}%
+\contentsline {section}{\numberline {2.3}静的なfractional ownership}{7}%
+\contentsline {chapter}{\numberline {第3章}問題点}{8}%
+\contentsline {chapter}{\numberline {第4章}本研究の提案}{12}%
+\contentsline {section}{\numberline {4.1}提案するインターフェース}{12}%
+\contentsline {section}{\numberline {4.2}実装}{18}%
+\contentsline {chapter}{\numberline {第5章}並列処理への応用}{21}%
+\contentsline {section}{\numberline {5.1}Rustの並列処理}{21}%
+\contentsline {subsection}{\numberline {5.1.1}通常のスレッド}{21}%
+\contentsline {subsection}{\numberline {5.1.2}scoped thread}{22}%
+\contentsline {section}{\numberline {5.2}並列処理の際の問題点}{22}%
+\contentsline {section}{\numberline {5.3}我々の提案の応用}{23}%
+\contentsline {subsection}{\numberline {5.3.1}Readers-Writer Lock}{24}%
+\contentsline {chapter}{\numberline {第6章}関連研究}{25}%
+\contentsline {chapter}{\numberline {第7章}結論と今後の課題}{26}%
+\contentsline {chapter}{参考文献}{27}%

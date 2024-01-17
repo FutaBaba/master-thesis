@@ -16,11 +16,6 @@ David~G. Clarke, John Potter, and James Noble.
   Programming Systems, Languages {\&} Applications, {OOPSLA} 1998, Vancouver,
   British Columbia, Canada, October 18-22, 1998}, pp. 48--64. {ACM}, 1998.
 
-\bibitem{DBLP:journals/cacm/CouroisHP71}
-Pierre{-}Jacques Courtois, F.~Heymans, and David~Lorge Parnas.
-\newblock Concurrent control with "readers" and "writers".
-\newblock {\em Commun. {ACM}}, Vol.~14, No.~10, pp. 667--668, 1971.
-
 \bibitem{DBLP:conf/sas/Boyland03}
 John Boyland.
 \newblock Checking interference with fractional permissions.
@@ -28,6 +23,11 @@ John Boyland.
   Symposium, {SAS} 2003, San Diego, CA, USA, June 11-13, 2003, Proceedings},
   Vol. 2694 of {\em Lecture Notes in Computer Science}, pp. 55--72. Springer,
   2003.
+
+\bibitem{DBLP:journals/cacm/CouroisHP71}
+Pierre{-}Jacques Courtois, F.~Heymans, and David~Lorge Parnas.
+\newblock Concurrent control with "readers" and "writers".
+\newblock {\em Commun. {ACM}}, Vol.~14, No.~10, pp. 667--668, 1971.
 
 \bibitem{10.1007/978-3-642-10672-9_11}
 Kohei Suenaga and Naoki Kobayashi.
