@@ -207,7 +207,7 @@ unsafeな機能が内部の実装で用いられているオブジェクトの�
 \texttt{Rc}オブジェクト\cite{rc}が存在する。
 \texttt{Rc}オブジェクトは、中身のオブジェクトへの参照と、共通の参照カウントを持つコンテナであり、動的な参照カウントにより静的なownershipを補っている。
 clone関数により複製が可能であり、その際共通の参照カウントを1増やし、参照が消滅する際には参照カウントを1減らし、参照カウントが0になったときに中身のオブジェクトを解放する。
-本来Rustの通常のownershipでは参照の複製はできないが、\texttt{Rc}オブジェクトの内部の実装で用いられているunsafeな機能により複製ができるようになる。
+本来Rustの通常のownershipは、複製した参照間で共有することはできないが、\texttt{Rc}オブジェクトの内部の実装で用いられているunsafeな機能により共有ができるようになる。
 なお、Rustの静的なownershipを無視するunsafeな機能が用いられているので、\texttt{Rc}オブジェクトは動的な柔軟性が必要な場合にのみ用いられるべきである。
 
 図\ref{rc_simple}は、
@@ -262,7 +262,7 @@ fn main() {
 静的にも動的にも検出することはできない。
 
 また、\texttt{into\_inner}関数の使用忘れやスコープの切り忘れを防止するために、それらをまとめた高階関数を用意することが考えられるが、
-Rustでは高階関数に引数として渡す関数内で用いられているオブジェクトのownershipのlifetimeの推論や指定方法は自明でないという問題がある。
+Rustのように静的なownershipに基づきメモリ管理を行う言語では、高階関数に引数として渡す関数内で用いられているオブジェクトのborrowingのlifetimeの推論や指定方法は自明でないという問題がある。
 % このようなメモリリークを検出する手段は、現在のRustには存在しない。
 % TODO ユーザのミスって何?
 % いろいろ直せるけど、ユーザのミスでRustは静的にも動的にもエラーを出さず、メモリリークを起こす。
@@ -1245,11 +1245,14 @@ fn drop(&mut self) {
 \end{figure}
 
 なお、実装からわかるように提案する参照オブジェクトは\texttt{Rc}オブジェクトの利用方法を強制しているオブジェクトであることから、\texttt{Rc}オブジェクトと\texttt{Rc}オブジェクトの中身を取り出す関数\texttt{into\_inner}を用いて実装することが可能のように思える。
-その際、図\ref{into_inner}のようにimmutableな参照オブジェクトのフィールドが\texttt{Rc}オブジェクトになり、フィールドに対して\texttt{into\_inner}を呼び出す必要がある。\texttt{into\_inner}の引数は、borrowingでなくmoveが起きることから、オブジェクトのフィールドがmoveするがRustではこれは許されず静的なエラーが発生する。
-従って、\texttt{Rc}オブジェクト以外にunsafeな機能を用いなければ実装することができない。
+その際、図\ref{into_inner}のようにimmutableな参照オブジェクトのフィールドが\texttt{Rc}オブジェクトになる。
+Mutableな参照からimmutableな参照に戻す際には、フィールドに対して\texttt{into\_inner}を呼び出す必要があり、
+\texttt{into\_inner}の引数は、borrowingでなくmoveが起きることから、オブジェクトのフィールドはmoveする。
+そのため、オブジェクトの解放より前にフィールドが解放されることになるが、オブジェクトの解放の際にフィールドを用いた処理が行われる可能性があるため、Rustではこれは許されず静的なエラーが発生する。
+従って、\texttt{Rc}オブジェクトを用いて提案する参照オブジェクトを実装する場合、\texttt{Rc}オブジェクト以外にunsafeな機能を用いる必要がある。
 
 \begin{figure}[htp]
-\begin{lstlisting}[caption=Rcオブジェクトと関数into\_innerによる実装, label=into_inner, captionpos=b]
+\begin{lstlisting}[caption=Rcオブジェクトと関数into\_innerによる実装の試み, label=into_inner, captionpos=b]
 pub struct FRefMut<T: ?Sized> {
     data: T,
 }
