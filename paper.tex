@@ -207,7 +207,7 @@ unsafeな機能が内部の実装で用いられているオブジェクトの�
 \texttt{Rc}オブジェクト\cite{rc}が存在する。
 \texttt{Rc}オブジェクトは、中身のオブジェクトへの参照と、共通の参照カウントを持つコンテナであり、動的な参照カウントにより静的なownershipを補っている。
 clone関数により複製が可能であり、その際共通の参照カウントを1増やし、参照が消滅する際には参照カウントを1減らし、参照カウントが0になったときに中身のオブジェクトを解放する。
-本来Rustの通常のownershipは、複製した参照間で共有することはできないが、\texttt{Rc}オブジェクトの内部の実装で用いられているunsafeな機能により共有ができるようになる。
+本来Rustでは、ownershipごと参照の複製をすることはできないが、\texttt{Rc}オブジェクトの内部の実装で用いられているunsafeな機能によりownershipごと参照の複製ができるようになる。
 なお、Rustの静的なownershipを無視するunsafeな機能が用いられているので、\texttt{Rc}オブジェクトは動的な柔軟性が必要な場合にのみ用いられるべきである。
 
 図\ref{rc_simple}は、
@@ -1222,23 +1222,25 @@ pub fn back_to_mut(self: FRefImmut<T>) -> FRefMut<T> { // Move
 
 \begin{figure}[htp]
 \begin{lstlisting}[caption=関数dropの実装, label=drop_implementation, captionpos=b]
-fn drop(&mut self) {
-    let count = self.inner().ref_count.fetch_sub(1, Relaxed);
-    if count > 1{
-        return
-    }
-    else if count == 1{
-        if panicking() {
+impl<T: ?Sized> Drop for FRefImmut<T> {
+    fn drop(&mut self) {
+        let count = self.inner().ref_count.fetch_sub(1, Relaxed);
+        if count > 1{
             return
         }
-        unsafe {
-            dealloc(self.ptr.cast().as_mut(), 
-            Layout::for_value_raw(self.ptr.as_ptr()))
+        else if count == 1{
+            if panicking() {
+                return
+            }
+            unsafe {
+                dealloc(self.ptr.cast().as_mut(), 
+                Layout::for_value_raw(self.ptr.as_ptr()))
+            }
+            panic!("cannot drop");
         }
-        panic!("cannot drop");
-    }
-    else {
-        abort();
+        else {
+            abort();
+        }
     }
 }
 \end{lstlisting}
@@ -1246,9 +1248,15 @@ fn drop(&mut self) {
 
 なお、実装からわかるように提案する参照オブジェクトは\texttt{Rc}オブジェクトの利用方法を強制しているオブジェクトであることから、\texttt{Rc}オブジェクトと\texttt{Rc}オブジェクトの中身を取り出す関数\texttt{into\_inner}を用いて実装することが可能のように思える。
 その際、図\ref{into_inner}のようにimmutableな参照オブジェクトのフィールドが\texttt{Rc}オブジェクトになる。
-Mutableな参照からimmutableな参照に戻す際には、フィールドに対して\texttt{into\_inner}を呼び出す必要があり、
+Immutableな参照からmutableな参照に戻す際には、フィールドに対して\texttt{into\_inner}を呼び出す必要があり、
 \texttt{into\_inner}の引数は、borrowingでなくmoveが起きることから、オブジェクトのフィールドはmoveする。
-そのため、オブジェクトの解放より前にフィールドが解放されることになるが、オブジェクトの解放の際にフィールドを用いた処理が行われる可能性があるため、Rustではこれは許されず静的なエラーが発生する。
+そのため、本来オブジェクトが解放された後にそのフィールドが解放されるはずだが、オブジェクトの解放より前にフィールドが解放されることになる。
+提案する参照オブジェクトでは、
+immutableな参照を消滅させる\texttt{drop}関数内で、
+オブジェクトの解放し忘れを検出するためにmutableな参照に戻し忘れていないか確認する必要があり、
+\texttt{drop}関数によってオブジェクトの解放の際にフィールドを用いた処理が行われる可能性がある。
+この場合、すでに解放されているフィールドを用いる処理が行われる可能性があるため、Rustでは静的なエラーが発生する。
+なお、オブジェクトとフィールドの解放を同時に行うように書くことはできない。
 従って、\texttt{Rc}オブジェクトを用いて提案する参照オブジェクトを実装する場合、\texttt{Rc}オブジェクト以外にunsafeな機能を用いる必要がある。
 
 \begin{figure}[htp]

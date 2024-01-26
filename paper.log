@@ -1,4 +1,4 @@
-This is e-pTeX, Version 3.14159265-p3.8.2-190908-2.6 (utf8.euc) (TeX Live 2019/Debian) (preloaded format=platex 2023.11.13)  26 JAN 2024 16:02
+This is e-pTeX, Version 3.14159265-p3.8.2-190908-2.6 (utf8.euc) (TeX Live 2019/Debian) (preloaded format=platex 2023.11.13)  26 JAN 2024 21:41
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -547,10 +547,10 @@ LaTeX Warning: There were undefined references.
 Here is how much of TeX's memory you used:
  5841 strings out of 481768
  78890 string characters out of 5933619
- 570563 words of memory out of 5000000
+ 571563 words of memory out of 5000000
  21179 multiletter control sequences out of 15000+600000
  548820 words of font info for 102 fonts, out of 8000000 for 9000
  934 hyphenation exceptions out of 8191
  31i,7n,36p,1208b,1499s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on paper.dvi (40 pages, 194644 bytes).
+Output written on paper.dvi (40 pages, 195780 bytes).
