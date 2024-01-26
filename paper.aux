@@ -1,122 +1,144 @@
 \relax 
-\@writefile{toc}{\contentsline {chapter}{謝辞}{iii}\protected@file@percent }
-\@writefile{lof}{\addvspace {10\jsc@mpt }}
-\@writefile{lot}{\addvspace {10\jsc@mpt }}
-\citation{DBLP:conf/sigada/MatsakisK14}
+\citation{DBLP:conf/sigada/MatsakisK14,rust-web,rust-book}
 \citation{DBLP:conf/oopsla/ClarkePN98}
+\citation{redox}
+\citation{dropbox}
+\citation{fire}
+\citation{rust-web}
+\citation{c-book}
+\citation{gc-book}
+\citation{rc}
 \@writefile{toc}{\contentsline {chapter}{\numberline {第1章}序論}{1}\protected@file@percent }
 \@writefile{lof}{\addvspace {10\jsc@mpt }}
 \@writefile{lot}{\addvspace {10\jsc@mpt }}
 \@writefile{toc}{\contentsline {section}{\numberline {1.1}背景}{1}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {1.2}目的}{1}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {1.3}本論文の構成}{1}\protected@file@percent }
-\@writefile{toc}{\contentsline {chapter}{\numberline {第2章}背景}{2}\protected@file@percent }
-\@writefile{lof}{\addvspace {10\jsc@mpt }}
-\@writefile{lot}{\addvspace {10\jsc@mpt }}
-\@writefile{toc}{\contentsline {section}{\numberline {2.1}Rustのownership}{2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.1.1}Ownership}{2}\protected@file@percent }
-\newlabel{ownership_nest_example}{{2.1}{2}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {2.1}Ownershipによるメモリ管理}{2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.1.2}Move}{2}\protected@file@percent }
-\newlabel{move_assign_example}{{2.2}{3}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {2.2}変数への代入でmoveが起こる例}{3}\protected@file@percent }
-\newlabel{move_function_example}{{2.3}{3}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {2.3}関数に引数を渡す際にmoveが起こる例}{3}\protected@file@percent }
-\newlabel{move_return_function}{{2.4}{3}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {2.4}危険な処理を避けた例}{3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.1.3}Borrowing}{4}\protected@file@percent }
-\newlabel{borrowing_example}{{2.5}{4}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {2.5}Borrowingの例}{4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.1.4}Mutableなborrowing}{4}\protected@file@percent }
-\newlabel{mutable_borrowing_example}{{2.6}{4}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {2.6}Mutableなborrowingの例}{4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.1.5}lifetime}{5}\protected@file@percent }
-\newlabel{lifetime_example2}{{2.7}{5}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {2.7}Lifetimeの例}{5}\protected@file@percent }
-\newlabel{lifetime_example}{{2.8}{5}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {2.8}Lifetime注釈}{5}\protected@file@percent }
 \citation{DBLP:conf/sas/Boyland03}
-\@writefile{toc}{\contentsline {section}{\numberline {2.2}Rustの参照カウント}{6}\protected@file@percent }
-\newlabel{rc_example}{{2.9}{6}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {2.9}Rcオブジェクトの利用例}{6}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {2.3}静的なfractional ownership}{7}\protected@file@percent }
-\@writefile{toc}{\contentsline {chapter}{\numberline {第3章}問題点}{8}\protected@file@percent }
+\newlabel{rc_simple}{{1.1}{2}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {1.1}静的なメモリ管理では柔軟性に欠ける例}{2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {1.2}本研究の概略}{2}\protected@file@percent }
+\citation{DBLP:conf/sas/Boyland03}
+\@writefile{toc}{\contentsline {section}{\numberline {1.3}本論文の構成}{3}\protected@file@percent }
+\newlabel{random_simple}{{1.2}{4}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {1.2}本研究の方式を用いた具体例}{4}\protected@file@percent }
+\newlabel{error_simple}{{1.3}{5}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {1.3}メモリリークを検出する例}{5}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{\numberline {第2章}背景}{6}\protected@file@percent }
 \@writefile{lof}{\addvspace {10\jsc@mpt }}
 \@writefile{lot}{\addvspace {10\jsc@mpt }}
-\newlabel{rc_problem}{{3.1}{8}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {3.1}Rcオブジェクトを利用する際の問題点}{8}\protected@file@percent }
-\newlabel{rc_scope_problem}{{3.2}{9}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {3.2}メモリリークを防いだ例}{9}\protected@file@percent }
-\newlabel{rc_miss_problem}{{3.3}{9}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {3.3}ユーザのミスによるメモリリーク}{9}\protected@file@percent }
-\newlabel{rc_random}{{3.4}{10}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {3.4}into\_inner関数を用いた例}{10}\protected@file@percent }
-\@writefile{toc}{\contentsline {chapter}{\numberline {第4章}本研究の提案}{12}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {2.1}Rustのownership}{6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1.1}Ownership}{6}\protected@file@percent }
+\newlabel{ownership_nest_example}{{2.1}{6}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {2.1}Ownershipによるメモリ管理}{6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1.2}Move}{6}\protected@file@percent }
+\newlabel{move_assign_example}{{2.2}{7}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {2.2}変数への代入でmoveが起こる例}{7}\protected@file@percent }
+\newlabel{move_function_example}{{2.3}{7}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {2.3}関数に引数を渡す際にmoveが起こる例}{7}\protected@file@percent }
+\newlabel{move_return_function}{{2.4}{8}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {2.4}Ownershipを返却する例}{8}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1.3}Borrowing}{8}\protected@file@percent }
+\newlabel{borrowing_example}{{2.5}{8}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {2.5}Borrowingの例}{8}\protected@file@percent }
+\citation{nll}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1.4}Mutableなborrowing}{9}\protected@file@percent }
+\newlabel{mutable_borrowing_example}{{2.6}{9}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {2.6}Mutableなborrowingの例}{9}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1.5}lifetime}{9}\protected@file@percent }
+\newlabel{lifetime_example}{{2.7}{10}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {2.7}Lifetime注釈}{10}\protected@file@percent }
+\newlabel{lifetime_example2}{{2.8}{10}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {2.8}スコープとlifetimeが一致していない例}{10}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {2.2}Rustの参照カウント}{10}\protected@file@percent }
+\newlabel{rc_example}{{2.9}{11}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {2.9}Rcオブジェクトの利用例}{11}\protected@file@percent }
+\citation{DBLP:conf/sas/Boyland03}
+\@writefile{toc}{\contentsline {section}{\numberline {2.3}静的なfractional ownership}{12}\protected@file@percent }
+\newlabel{fractional_example}{{2.10}{12}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {2.10}Fractional ownershipの利用例}{12}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{\numberline {第3章}問題点}{13}\protected@file@percent }
 \@writefile{lof}{\addvspace {10\jsc@mpt }}
 \@writefile{lot}{\addvspace {10\jsc@mpt }}
-\@writefile{toc}{\contentsline {section}{\numberline {4.1}提案するインターフェース}{12}\protected@file@percent }
-\newlabel{random_example}{{4.1}{12}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {4.1}新たな参照オブジェクトを用いた柔軟なメモリ管理の例}{12}\protected@file@percent }
-\newlabel{error_example1}{{4.2}{13}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {4.2}オブジェクトの解放し忘れを検出する例}{13}\protected@file@percent }
-\newlabel{error_result1}{{4.3}{14}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {4.3}オブジェクトの解放し忘れのエラー}{14}\protected@file@percent }
-\newlabel{error_example2}{{4.4}{15}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {4.4}Mutableな参照へ戻せないことを検出する例}{15}\protected@file@percent }
-\newlabel{error_result2}{{4.5}{15}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {4.5}Mutableな参照に戻し忘れた際のエラー}{15}\protected@file@percent }
-\newlabel{error_example3}{{4.6}{16}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {4.6}ユーザのミスを検出する例}{16}\protected@file@percent }
-\newlabel{error_result3}{{4.7}{17}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {4.7}ユーザのミスによるエラー}{17}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {4.2}実装}{18}\protected@file@percent }
-\newlabel{struct_implementation}{{4.8}{18}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {4.8}新たな参照オブジェクトの実装}{18}\protected@file@percent }
-\newlabel{new_to_implementation}{{4.9}{18}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {4.9}関数newと関数to\_immutの実装}{18}\protected@file@percent }
-\newlabel{clone_implementation}{{4.10}{19}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {4.10}関数clone\_immutの実装}{19}\protected@file@percent }
-\newlabel{back_implementation}{{4.11}{19}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {4.11}関数back\_to\_mutの実装}{19}\protected@file@percent }
-\newlabel{drop_implementation}{{4.12}{20}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {4.12}関数back\_to\_mutの実装}{20}\protected@file@percent }
-\@writefile{toc}{\contentsline {chapter}{\numberline {第5章}並列処理への応用}{21}\protected@file@percent }
+\newlabel{rc_problem}{{3.1}{14}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {3.1}Rcオブジェクトを利用する際の問題点}{14}\protected@file@percent }
+\newlabel{rc_scope_problem}{{3.2}{15}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {3.2}メモリリークを防いだ例}{15}\protected@file@percent }
+\newlabel{rc_miss_problem}{{3.3}{16}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {3.3}ユーザのミスによるメモリリーク}{16}\protected@file@percent }
+\newlabel{rc_random}{{3.4}{17}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {3.4}into\_inner関数を用いた例}{17}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{\numberline {第4章}本研究の提案}{18}\protected@file@percent }
 \@writefile{lof}{\addvspace {10\jsc@mpt }}
 \@writefile{lot}{\addvspace {10\jsc@mpt }}
-\@writefile{toc}{\contentsline {section}{\numberline {5.1}Rustの並列処理}{21}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.1.1}通常のスレッド}{21}\protected@file@percent }
-\newlabel{thread_example}{{5.1}{21}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {5.1}Rustでの通常のスレッド生成の例}{21}\protected@file@percent }
-\newlabel{thread_borrow_example}{{5.2}{21}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {5.2}通常のスレッドでborrowingができない例}{21}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.1.2}scoped thread}{22}\protected@file@percent }
-\newlabel{scoped_thread_example}{{5.3}{22}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {5.3}scoped threadの例}{22}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {5.2}並列処理の際の問題点}{22}\protected@file@percent }
-\newlabel{scoped_thread_problem}{{5.4}{22}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {5.4}scoped threadで表せない例}{22}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {5.3}我々の提案の応用}{23}\protected@file@percent }
-\newlabel{scoped_example}{{5.5}{23}}
-\@writefile{lol}{\contentsline {lstlisting}{\numberline {5.5}新たな参照オブジェクトを用いた並列処理の例}{23}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4.1}提案するインターフェース}{18}\protected@file@percent }
+\newlabel{random_example}{{4.1}{19}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {4.1}新たな参照オブジェクトを用いた柔軟なメモリ管理の例}{19}\protected@file@percent }
+\newlabel{error_example1}{{4.2}{20}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {4.2}オブジェクトの解放し忘れを検出する例}{20}\protected@file@percent }
+\newlabel{error_result1}{{4.3}{21}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {4.3}オブジェクトの解放し忘れのエラー}{21}\protected@file@percent }
+\newlabel{error_example2}{{4.4}{22}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {4.4}Mutableな参照へ戻せないことを検出する例}{22}\protected@file@percent }
+\newlabel{error_result2}{{4.5}{23}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {4.5}Mutableな参照に戻し忘れた際のエラー}{23}\protected@file@percent }
+\newlabel{error_example3}{{4.6}{24}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {4.6}ユーザのミスを検出する例}{24}\protected@file@percent }
+\newlabel{error_result3}{{4.7}{25}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {4.7}ユーザのミスによるエラー}{25}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4.2}実装}{26}\protected@file@percent }
+\newlabel{struct_implementation}{{4.8}{26}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {4.8}新たな参照オブジェクトの実装}{26}\protected@file@percent }
+\newlabel{new_to_implementation}{{4.9}{27}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {4.9}関数newと関数to\_immutの実装}{27}\protected@file@percent }
+\newlabel{clone_implementation}{{4.10}{27}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {4.10}関数clone\_immutの実装}{27}\protected@file@percent }
+\newlabel{back_implementation}{{4.11}{28}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {4.11}関数back\_to\_mutの実装}{28}\protected@file@percent }
+\newlabel{drop_implementation}{{4.12}{28}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {4.12}関数dropの実装}{28}\protected@file@percent }
+\newlabel{into_inner}{{4.13}{29}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {4.13}Rcオブジェクトと関数into\_innerによる実装}{29}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{\numberline {第5章}並列処理への応用}{30}\protected@file@percent }
+\@writefile{lof}{\addvspace {10\jsc@mpt }}
+\@writefile{lot}{\addvspace {10\jsc@mpt }}
+\@writefile{toc}{\contentsline {section}{\numberline {5.1}Rustの並列処理}{30}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1.1}通常のスレッド}{30}\protected@file@percent }
+\newlabel{thread_example}{{5.1}{30}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {5.1}Rustでの通常のスレッド生成の例}{30}\protected@file@percent }
+\newlabel{thread_borrow_example}{{5.2}{31}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {5.2}通常のスレッドでborrowingができない例}{31}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1.2}scoped thread}{31}\protected@file@percent }
+\newlabel{scoped_thread_example}{{5.3}{31}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {5.3}Scoped threadの例}{31}\protected@file@percent }
 \citation{DBLP:journals/cacm/CouroisHP71}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.3.1}Readers-Writer Lock}{24}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5.2}並列処理の際の問題点}{32}\protected@file@percent }
+\newlabel{scoped_thread_problem}{{5.4}{32}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {5.4}scoped threadで表せない例}{32}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5.3}我々の提案の応用}{32}\protected@file@percent }
+\newlabel{scoped_example}{{5.5}{33}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {5.5}新たな参照オブジェクトを用いた並列処理の例}{33}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3.1}Readers-Writer Lock}{33}\protected@file@percent }
+\newlabel{rwlock}{{5.6}{34}}
+\@writefile{lol}{\contentsline {lstlisting}{\numberline {5.6}Readers-Writer Lockを用いた並列処理の例}{34}\protected@file@percent }
 \citation{DBLP:conf/sas/Boyland03}
 \citation{10.1007/978-3-642-10672-9_11}
 \citation{10.1007/978-3-031-50521-8_11}
 \citation{DBLP:journals/pacmpl/0002JKD18}
-\@writefile{toc}{\contentsline {chapter}{\numberline {第6章}関連研究}{25}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{\numberline {第6章}関連研究}{35}\protected@file@percent }
 \@writefile{lof}{\addvspace {10\jsc@mpt }}
 \@writefile{lot}{\addvspace {10\jsc@mpt }}
-\@writefile{toc}{\contentsline {chapter}{\numberline {第7章}結論と今後の課題}{26}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{\numberline {第7章}結論と今後の課題}{36}\protected@file@percent }
 \@writefile{lof}{\addvspace {10\jsc@mpt }}
 \@writefile{lot}{\addvspace {10\jsc@mpt }}
-\bibstyle{junsrt}
+\bibstyle{jplain}
 \bibdata{refs}
-\bibcite{DBLP:conf/sigada/MatsakisK14}{1}
+\@writefile{toc}{\contentsline {chapter}{謝辞}{37}\protected@file@percent }
+\@writefile{lof}{\addvspace {10\jsc@mpt }}
+\@writefile{lot}{\addvspace {10\jsc@mpt }}
+\bibcite{DBLP:conf/sas/Boyland03}{1}
 \bibcite{DBLP:conf/oopsla/ClarkePN98}{2}
-\bibcite{DBLP:conf/sas/Boyland03}{3}
-\bibcite{DBLP:journals/cacm/CouroisHP71}{4}
-\bibcite{10.1007/978-3-642-10672-9_11}{5}
+\bibcite{DBLP:journals/cacm/CouroisHP71}{3}
+\bibcite{DBLP:journals/pacmpl/0002JKD18}{4}
+\bibcite{DBLP:conf/sigada/MatsakisK14}{5}
 \bibcite{10.1007/978-3-031-50521-8_11}{6}
-\bibcite{DBLP:journals/pacmpl/0002JKD18}{7}
-\@writefile{toc}{\contentsline {chapter}{参考文献}{27}\protected@file@percent }
+\bibcite{10.1007/978-3-642-10672-9_11}{7}
+\@writefile{toc}{\contentsline {chapter}{参考文献}{38}\protected@file@percent }
