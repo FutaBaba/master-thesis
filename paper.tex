@@ -110,7 +110,6 @@
 
 \begin{document}
 \frontmatter% ここから前文
-% TODO 乗せたコードは全部確認!
 % \maketitle
 % 予備審査の時の要旨
 %   Rustはownershipという概念に基づいて安全な静的メモリ管理を行うプログラミング言語である。
@@ -199,7 +198,7 @@ Rust登場以前は、メモリ管理はユーザが手動で管理する方式
 しかしRustのメモリ管理は、手動のメモリ管理と異なり、解放し忘れによるメモリリークなどをコンパイル時に検出でき、
 さらに、実行時ガベージコレクタを用いたメモリ管理より効率が良い。
 % TODO 効率がよいことのリファレンス
-そのため、ユーザはメモリ管理という低レベルの制御をこれまでの方式と比べて楽に、効率よく行うことができる。
+そのため、ユーザはメモリ管理という低レベルの制御を、これまでの方式と比べて楽に効率よく行うことができる。
 
 しかし、Rustのメモリ管理は静的であり、動的なメモリ管理と比べると柔軟性に欠ける場合がある。
 そのためRustには、静的なownershipを無視する抜け道としてunsafeな機能が存在する。
@@ -207,20 +206,21 @@ unsafeな機能が内部の実装で用いられているオブジェクトの�
 \texttt{Rc}オブジェクト\cite{rc}が存在する。
 \texttt{Rc}オブジェクトは、中身のオブジェクトへの参照と、共通の参照カウントを持つコンテナであり、動的な参照カウントにより静的なownershipを補っている。
 clone関数により複製が可能であり、その際共通の参照カウントを1増やし、参照が消滅する際には参照カウントを1減らし、参照カウントが0になったときに中身のオブジェクトを解放する。
-本来Rustでは、ownershipごと参照の複製をすることはできないが、\texttt{Rc}オブジェクトの内部の実装で用いられているunsafeな機能によりownershipごと参照の複製ができるようになる。
+本来Rustでは、ownershipの複製をすることはできないが、\texttt{Rc}オブジェクトの内部の実装で用いられているunsafeな機能によりownershipの複製ができるようになる。
 なお、Rustの静的なownershipを無視するunsafeな機能が用いられているので、\texttt{Rc}オブジェクトは動的な柔軟性が必要な場合にのみ用いられるべきである。
 
 図\ref{rc_simple}は、
 静的なownershipのみではメモリ管理が難しい例であり、
-\texttt{Rc}オブジェクトの柔軟性を活用した例である。
+\texttt{Rc}オブジェクトの動的な参照カウントの柔軟性を活用した例である。
 中身の値が\texttt{"Hello"}という文字列である
 \texttt{String}オブジェクトを持つ
 \texttt{Rc}オブジェクト\texttt{h}と、
 中身の値が\texttt{"World"}という文字列である
 \texttt{String}オブジェクトを持つ
 \texttt{Rc}オブジェクト\texttt{w}の複製をランダムに10回配列に入れ、
-その配列から中身が\texttt{"Hello"}という文字列である\texttt{String}オブジェクトを持つ\texttt{Rc}オブジェクトを
+その配列から中身の値が\texttt{"Hello"}という文字列である\texttt{String}オブジェクトを持つ\texttt{Rc}オブジェクトを
 削除するプログラムである。
+このプログラムは、
 オブジェクトの生存区間が中身の値に依存するため、静的なメモリ管理は難しい。
 \begin{figure}[htp]
 \begin{lstlisting}[caption=静的なメモリ管理では柔軟性に欠ける例, label=rc_simple, captionpos=b]
@@ -231,12 +231,10 @@ fn main() {
     let mut rng = rand::thread_rng();
     for _ in 0..10 {
         if rng.gen() {
-            let h_clone = h.clone();
-            vec.push(h_clone);
+            vec.push(h.clone());
         }
         else {
-            let w_clone = w.clone();
-            vec.push(w_clone);
+            vec.push(w.clone());
         }
     }
     remove_string(&mut vec, String::from("Hello"));
@@ -253,6 +251,8 @@ fn main() {
 このように、\texttt{Rc}オブジェクトを用いた場合、
 意図せず複製が残ってしまうことにより、
 メモリリークのおそれがある。
+% Rustは、メモリリークを防止できるというメリットがあるが、
+% \texttt{Rc}オブジェクトを用いるとこのメリットが損なわれてしまう。
 このメモリリークは、後ほど第3章で述べるように、
 3行目から16行目を別のスコープにすることで防ぐことができる。
 また、同様に第3章で詳しく述べているが、
@@ -263,9 +263,6 @@ fn main() {
 
 また、\texttt{into\_inner}関数の使用忘れやスコープの切り忘れを防止するために、それらをまとめた高階関数を用意することが考えられるが、
 Rustのように静的なownershipに基づきメモリ管理を行う言語では、高階関数に引数として渡す関数内で用いられているオブジェクトのborrowingのlifetimeの推論や指定方法は自明でないという問題がある。
-% このようなメモリリークを検出する手段は、現在のRustには存在しない。
-% TODO ユーザのミスって何?
-% いろいろ直せるけど、ユーザのミスでRustは静的にも動的にもエラーを出さず、メモリリークを起こす。
 
 \section{本研究の概略}
 本研究では、柔軟な複製を許すものの、ユーザのミスによりメモリリークが起きやすい\texttt{Rc}オブジェクトに代わり、
@@ -304,7 +301,7 @@ ownershipが0より大きいオブジェクトは、
 fn main() {
     let mut vec: Vec<FRefImmut<String>> = Vec::new();
     let mut h = FRefMut::new(String::from("Hello"));
-    let mut w = FRefMut::new(String::from("World"));
+    let mut w = FRefMut::new(String::from"World"));
     let mut rng = rand::thread_rng();
     let h_immut = h.to_immut();
     let w_immut = w.to_immut();
@@ -590,7 +587,8 @@ Rustには\texttt{Rc} (参照カウント) オブジェクトも存在する。
 \texttt{Rc}オブジェクトの実装には、Rustの静的なownershipを無視するunsafeな機能が用いられている。
 
 \texttt{Rc}オブジェクトは、図\ref{rc_example}のように用いられる。
-このプログラムは、中身に\texttt{"Hello"}という\texttt{String}オブジェクトを持つ
+このプログラムは、
+中身に\texttt{"Hello"}という\texttt{String}オブジェクトを持つ
 \texttt{Rc}オブジェクト\texttt{h}と、中身に\texttt{"World"}という\texttt{String}オブジェクトを持つ
 \texttt{Rc}オブジェクト\texttt{w}の複製をランダムに10回配列に入れ、
 その配列から\texttt{"Hello"}という\texttt{String}オブジェクトを持つ\texttt{Rc}オブジェクトを
@@ -825,6 +823,8 @@ fn main() {
 ユーザによるミスが起こりやすく、結果としてメモリリークが起きる場合がある。
 現在、Rustでこのようなメモリリークが起きないことは静的に検査する手段が存在しないだけでなく、
 動的に検査する手段も存在していない。
+Rustはメモリリークを防止できるというメリットがあるが、
+\texttt{Rc}オブジェクトを用いるとそのメリットが損なわれることになる。
 
 \chapter{本研究の提案}
 本研究では、Rustの静的なownershipによるメモリ管理と、
@@ -837,14 +837,14 @@ fn main() {
 という問題を解決するために、
 図\ref{random_example}のように用いることができる参照オブジェクトを提案する。
 このプログラムは、中身に\texttt{"Hello"}という\texttt{String}オブジェクトを持つ
-mutableな参照オブジェクト\texttt{h}と、中身に\texttt{"World"}という\texttt{String}オブジェクトを持つ
-mutableな参照オブジェクト\texttt{w}をどちらもimmutableな参照オブジェクトに変換した後、
+\texttt{FRefMut}オブジェクト\texttt{h}と、中身に\texttt{"World"}という\texttt{String}オブジェクトを持つ
+\texttt{FRefMut}オブジェクト\texttt{w}をどちらも\texttt{FRefImmut}オブジェクトに変換した後、
 複製をランダムに10回配列に入れ、
-その配列から\texttt{"Hello"}という\texttt{String}オブジェクトを持つimmutableな参照オブジェクトを
+その配列から\texttt{"Hello"}という\texttt{String}オブジェクトを持つ\texttt{FRefImmut}オブジェクトを
 削除するプログラムである。
-7、8行目で生成したmutableな参照を、10、11行目でimmutableな参照に変換し、
-14、19行目でimmutableな参照を複製している。
-\texttt{remove\_string}が終了した後、26行目、32行目でmutableな参照に戻している。
+7、8行目で生成した\texttt{FRefMut}オブジェクトを、10、11行目で\texttt{FRefImmut}オブジェクトに変換し、
+14、19行目で\texttt{FRefImmut}オブジェクトを複製している。
+\texttt{remove\_string}が終了した後、26行目、32行目で\texttt{FRefMut}オブジェクトに戻している。
 \begin{figure}[htp]
 \begin{lstlisting}[caption=新たな参照オブジェクトを用いた柔軟なメモリ管理の例, 
   label=random_example, captionpos=b]
@@ -857,58 +857,58 @@ fn remove_string(vec: &mut Vec<FRefImmut<String>>, s: String) {
 
 fn main() {
   let mut vec: Vec<FRefImmut<String>> = Vec::new();
-  let mut h = FRefMut::new(String::from("Hello")); // Mutableな参照
-  let mut w = FRefMut::new(String::from("World")); // Mutableな参照
+  let mut h = FRefMut::new(String::from("Hello")); // FRefMutの生成
+  let mut w = FRefMut::new(String::from("World")); // FRefMutの生成
   let mut rng = rand::thread_rng();
-  let h_immut = h.to_immut(); // Mutableからimmutableへ変換
-  let w_immut = w.to_immut(); // Mutableからimmutableへ変換
+  let h_immut = h.to_immut(); // FRefMutからFRefImmutへ変換
+  let w_immut = w.to_immut(); // FRefMutからFRefImmutへ変換
   for _ in 0..10 {
     if rng.gen() {
-      let h_immut1 = h_immut.clone_immut(); // 参照の複製
+      let h_immut1 = h_immut.clone_immut(); // FRefImmutの複製
       println!("{}", h_immut1);
       vec.push(h_immut1);
     }
     else {
-      let w_immut1 = w_immut.clone_immut(); // 参照の複製
+      let w_immut1 = w_immut.clone_immut(); // FRefImmutの複製
       println!("{}", w_immut1);
       vec.push(w_immut1);
     }
   }
   remove_string(&mut vec, String::from("Hello"));
-  let mut h_mut = h_immut.back_to_mut(); // Immutableからmutableへ
+  let mut h_mut = h_immut.back_to_mut(); // FRefImmutからFRefMutへ
   h_mut.push_str("hoge");
   println!("{}", h_mut);
   drop(h_mut);
   drop(vec);
-  let mut w_mut = w_immut.back_to_mut(); // Immutableからmutableへ
+  let mut w_mut = w_immut.back_to_mut(); // FRefImmutからFRefMutへ
 }
 \end{lstlisting}
 \end{figure}
 
-この参照オブジェクトは、読み書き可能であるmutableな参照オブジェクトと
-読み取りのみ可能であるimmutableな参照オブジェクトの2つがあり、静的に区別されている。
-Mutableな参照はRustの通常のownershipに従い、同時に一つしか存在しない。
-Mutableな参照は、7、8行目のように\texttt{new}関数により生成できる。
-10、11行目のように\texttt{to\_immut}関数を用いると、mutableな参照をimmutableな参照に変換でき、
-その際Rustの静的なownershipのmoveによりmutableな参照は消滅する。
+この参照オブジェクトは、読み書き可能であり、かつ解放が可能な\texttt{FRefMut}オブジェクトと
+読み取りのみ可能である\texttt{FRefImmut}オブジェクトの2つがあり、静的に区別されている。
+\texttt{FRefMut}オブジェクトはRustの通常のownershipに従い、同時に一つしか存在しない。
+\texttt{FRefMut}オブジェクトは、7、8行目のように\texttt{new}関数により生成できる。
+10、11行目のように\texttt{to\_immut}関数を用いると、\texttt{FRefMut}オブジェクトを\texttt{FRefImmut}オブジェクトに変換でき、
+その際Rustの静的なownershipのmoveにより\texttt{FRefMut}オブジェクトは消滅する。
 14、19行目のように、
-Immutableな参照は、Rustの通常のownershipに違反して\texttt{clone\_immut}関数により複製が可能であり、
+\texttt{FRefImmut}オブジェクトは、Rustの通常のownershipに違反して\texttt{clone\_immut}関数により複製が可能であり、
 複製の数を動的にカウントする。
 26、32行目のように、
 参照カウントが1つであるときのみ、
-\texttt{back\_to\_immut}関数を用いてimmutableな参照からmutableな参照へ変換でき、
-その際moveによりimmutableな参照は消滅する。
-Immutableな参照からmutableな参照に戻し忘れると、実行時エラーが発生するため、
+\texttt{back\_to\_immut}関数を用いて\texttt{FRefImmut}オブジェクトから\texttt{FRefMut}オブジェクトへ変換でき、
+その際moveにより\texttt{FRefImmut}オブジェクトは消滅する。
+\texttt{FRefImmut}オブジェクトから\texttt{FRefMut}オブジェクトに戻し忘れると、実行時エラーが発生するため、
 オブジェクトの解放し忘れが検出できる。
 
 また、図\ref{error_example2}は、図\ref{random_example}とほぼ同じプログラムであるが、
-参照カウントが1でないにも関わらずimmutableな参照をmutableな参照に戻そうとしているプログラムである。
+参照カウントが1でないにも関わらず\texttt{FRefImmut}オブジェクトを\texttt{FRefMut}オブジェクトに戻そうとしているプログラムである。
 この場合、mutableな参照に戻すことができずに図\ref{error_result2}のような実行時エラーが発生するため、
-mutableな参照でないと消滅させることはできないようユーザに強制することができている。
+\texttt{FRefMut}オブジェクトでないと消滅させることはできないようユーザに強制することができている。
 
 図\ref{error_example1}は、図\ref{random_example}とほぼ同じプログラムであるが、
-immutableな参照をmutableな参照に戻していないプログラムである。
-この場合、mutableな参照に戻さないまま参照が消滅してしまっているため図\ref{error_result1}のように実行時エラーが発生し、
+\texttt{FRefImmut}オブジェクトを\texttt{FRefMut}オブジェクトに戻していないプログラムである。
+この場合、\texttt{FRefMut}オブジェクトに戻さないまま参照が消滅してしまっているため図\ref{error_result1}のように実行時エラーが発生し、
 オブジェクトの解放し忘れを検出することができる。
 
 \begin{figure}[htp]
@@ -923,25 +923,25 @@ fn remove_string(vec: &mut Vec<FRefImmut<String>>, s: String) {
 
 fn main() {
   let mut vec: Vec<FRefImmut<String>> = Vec::new();
-  let h = FRefMut::new(String::from("Hello")); // Mutableな参照
-  let w = FRefMut::new(String::from("World")); // Mutableな参照
+  let h = FRefMut::new(String::from("Hello")); // FRefMutの生成
+  let w = FRefMut::new(String::from("World")); // FRefMutの生成
   let mut rng = rand::thread_rng();
-  let h_immut = h.to_immut(); // Mutableからimmutableへ変換
-  let w_immut = w.to_immut(); // Mutableからimmutableへ変換
+  let h_immut = h.to_immut(); // FRefMutからFRefImmutへ変換
+  let w_immut = w.to_immut(); // FRefMutからFRefImmutへ変換
   for _ in 0..10 {
     if rng.gen() {
-      let h_immut1 = h_immut.clone_immut(); // 参照の複製
+      let h_immut1 = h_immut.clone_immut(); // FRefImmutの複製
       println!("{}", h_immut1);
       vec.push(h_immut1);
     }
     else {
-      let w_immut1 = w_immut.clone_immut(); // 参照の複製
+      let w_immut1 = w_immut.clone_immut(); // FRefImmutの複製
       println!("{}", w_immut1);
       vec.push(w_immut1);
     }
   }
   remove_string(&mut vec, String::from("Hello"));
-  // Mutableに戻していない
+  // FRefMutに戻していない
 } // error!
 \end{lstlisting}
 \end{figure}
@@ -966,7 +966,7 @@ World
 World
 thread 'main' panicked at /home/baba/experiment-report/202401/0105
     /dynamic_error_example2/src/lib.rs:154:17:
-cannot drop
+memory leak
 note: run with `RUST_BACKTRACE=1` 
     environment variable to display a backtrace
 \end{lstlisting}
@@ -1010,7 +1010,7 @@ fn main() {
 \end{lstlisting}
 \end{figure}
 \begin{figure}[p]
-\begin{lstlisting}[caption=Mutableな参照に戻し忘れた際のエラー, 
+\begin{lstlisting}[caption=FRefMutに戻し忘れた際のエラー, 
   label=error_result2, captionpos=b]
 $ cargo run
    Compiling dynamic_error_example v0.1.0
@@ -1037,7 +1037,7 @@ note: run with `RUST_BACKTRACE=1`
 
 図\ref{error_example3}は、図\ref{random_example}とほぼ同じプログラムであるが、
 文字列を削除する際にスペルミスをしてしまっているプログラムである。
-この場合、mutableな参照に戻すことができずに図\ref{error_result3}のように実行時エラーが発生するため、
+この場合、\texttt{FRefMut}に戻すことができずに図\ref{error_result3}のように実行時エラーが発生するため、
 メモリリークを防ぐことができている。
 \begin{figure}[p]
 \begin{lstlisting}[caption=ユーザのミスを検出する例, 
@@ -1123,12 +1123,15 @@ note: run with `RUST_BACKTRACE=1`
 \newpage
 \section{実装}
 % 0120 check
-Mutableな参照オブジェクト、immutableな参照オブジェクトは図\ref{struct_implementation}のように実装した。
-Mutableな参照オブジェクトは、オブジェクトを保持するコンテナとして実装した。
-Immutableな参照オブジェクトは、
-Rustのownershipを無視する特別なポインタであるNonNullオブジェクトを保持するオブジェクトとして実装した。
+\texttt{FRefMut}オブジェクト、\texttt{FRefImmut}オブジェクトは図\ref{struct_implementation}のように実装した。
+\texttt{FRefMut}オブジェクトは、オブジェクトを保持するコンテナとして実装した。
+\texttt{FRefImmut}オブジェクトは、
+Rustのownershipを無視する特別なポインタであるNonNullオブジェクトと、
+PhantomDataを保持するオブジェクトとして実装した。
 NonNullオブジェクトにより、参照の複製が可能になる。
-Immutableな参照内のポインタはFRefInnerオブジェクトへのポインタであり、
+また、PhantomDataにより、\texttt{FRefImmut}がT型の値を保持することを
+コンパイラに示している。
+\texttt{FRefImmut}内のポインタは\texttt{FRefInner}オブジェクトへのポインタであり、
 このオブジェクトは参照カウントと中身のオブジェクトを保持する。
 \begin{figure}[htp]
 \begin{lstlisting}[caption=新たな参照オブジェクトの実装, label=struct_implementation, captionpos=b]
@@ -1136,7 +1139,8 @@ pub struct FRefMut<T: ?Sized> {
     data: T,
 }
 pub struct FRefImmut<T: ?Sized> {
-    ptr: NonNull<FRefInner<T>>
+    ptr: NonNull<FRefInner<T>>,
+    phantom: PhantomData<FRefInner<T>>
 }
 struct FRefInner<T: ?Sized> {
     ref_count: atomic::AtomicUsize,
@@ -1145,30 +1149,30 @@ struct FRefInner<T: ?Sized> {
 \end{lstlisting}
 \end{figure}
 
-オブジェクトを引数として受け取り、そのオブジェクトを中身として持つMutableな参照オブジェクトを生成する\texttt{new}関数と、mutableな参照オブジェクトを引数として受け取り、
-immutableな参照オブジェクトに変換して返す\texttt{to\_immut}関数は
+オブジェクトを引数として受け取り、そのオブジェクトを中身として持つ\texttt{FRefMut}オブジェクトを生成する\texttt{new}関数と、\texttt{FRefMut}オブジェクトを引数として受け取り、
+\texttt{FRefImmut}オブジェクトに変換して返す\texttt{to\_immut}関数は
 図\ref{new_to_implementation}ように実装した。
 4行目で\texttt{to\_immut}関数の引数は、borrowingでなくmoveが起きるようにすることで、
-変換した後引数のmutableな参照が消滅するように実装した。
+変換した後引数の\texttt{FRefMut}が消滅するように実装した。
 
-Immutableな参照オブジェクトを引数として受け取り、
+\texttt{FRefImmut}オブジェクトを引数として受け取り、
 複製した参照を返す\texttt{clone\_immut}関数は図\ref{clone_implementation}ように実装した。
 \texttt{clone\_immut}関数の引数をborrowingにすることで、複製元の参照が消滅せずに利用できるように実装した。
-また、2行目の\texttt{fetch\_add}関数によってimmutableな参照の内部の参照カウントが1増加するように実装した。
+また、2行目の\texttt{fetch\_add}関数によって\texttt{FRefImmut}の内部の参照カウントが1増加するように実装した。
 
-Immutableな参照オブジェクトを引数として受け取り、
-mutableな参照オブジェクトに変換する\texttt{back\_to\_mut}関数は
+\texttt{FRefImmut}オブジェクトを引数として受け取り、
+\texttt{FRefMut}オブジェクトに変換する\texttt{back\_to\_mut}関数は
 図\ref{back_implementation}のように実装した。
 \texttt{back\_to\_mut}関数の引数をborowwingでなくmoveするようにし、
-変換した後引数のimmutableな参照が消滅するように実装した。
-また、2行目でimmutableな参照の参照カウントが1でなければ実行時エラーが起きるようにし、
-immutableな参照のままでは消滅できないように実装した。
+変換した後引数の\texttt{FRefImmut}が消滅するように実装した。
+また、2行目で\texttt{FRefImmut}の参照カウントが1でなければ実行時エラーが起きるようにし、
+\texttt{FRefImmut}のままでは消滅できないように実装した。
 
-Immutableな参照を引数として受け取り、
+\texttt{FRefImmut}オブジェクトを引数として受け取り、
 その参照を消滅させる\texttt{drop}関数は図\ref{drop_implementation}のように実装した。
 参照カウントが2以上である場合は、参照カウントを1減少させ、
 参照カウントが1である場合は実行時エラーが起きるようにすることで、
-immutableな参照をmutableな参照に戻さずに消滅できなように実装した。
+\texttt{FRefImmut}を\texttt{FRefMut}に戻さずに消滅できなように実装した。
 これにより、オブジェクトの解放し忘れを検出することが可能である。
 
 \begin{figure}[htp]
@@ -1179,12 +1183,12 @@ pub fn new(data: T) -> FRefMut<T> {
 pub fn to_immut(self: FRefMut<T>) -> FRefImmut<T>{ // Moveにより消滅
     let mut this = ManuallyDrop::new(self);
     let inner =
-        unsafe{ptr::read(Self::get_mut_unchecked(&mut this))};
-    let x: Box<_> = Box::new(FRefInner {
+        unsafe{ptr::read(&mut this.data)};
+    let x = Box::new(FRefInner {
         ref_count: AtomicUsize::new(1),
         data: inner,
     });
-    FRefImmut {ptr: Box::leak(x).into()}
+    FRefImmut {ptr: Box::leak(x).into(), phantom:PhantomData}
 }
 \end{lstlisting}
 \end{figure}
@@ -1197,7 +1201,7 @@ pub fn clone_immut(&self: &FRefImmut<T>) -> FRefImmut<T>
     if old_size > MAX_REFCOUNT {
         abort();
     }
-    FRefImmut { ptr: self.ptr }
+    FRefImmut { ptr: self.ptr, phantom: PhantomData }
 }
 \end{lstlisting}
 \end{figure}
@@ -1210,10 +1214,10 @@ pub fn back_to_mut(self: FRefImmut<T>) -> FRefMut<T> { // Move
     }
     let mut this = ManuallyDrop::new(self);
     let inner =
-        unsafe { ptr::read(Self::get_mut_unchecked(&mut this))};
+        unsafe { ptr::read(&mut (*this.ptr.as_ptr()).data)};
     unsafe {
         dealloc(this.ptr.cast().as_mut(), 
-        Layout::for_value_raw(this.ptr.as_ptr()))
+                Layout::for_value_raw(this.ptr.as_ptr()))
     }
     FRefMut { data: inner }
 }
@@ -1225,18 +1229,15 @@ pub fn back_to_mut(self: FRefImmut<T>) -> FRefMut<T> { // Move
 impl<T: ?Sized> Drop for FRefImmut<T> {
     fn drop(&mut self) {
         let count = self.inner().ref_count.fetch_sub(1, Relaxed);
+        atomic::fence(Acquire);
         if count > 1{
             return
         }
         else if count == 1{
-            if panicking() {
-                return
+            unsafe { ptr::drop_in_place(self.ptr.as_ptr()) };
+            if !panicking() {
+                panic!("memory leak");
             }
-            unsafe {
-                dealloc(self.ptr.cast().as_mut(), 
-                Layout::for_value_raw(self.ptr.as_ptr()))
-            }
-            panic!("cannot drop");
         }
         else {
             abort();
@@ -1375,15 +1376,15 @@ fn main() {
 \section{我々の提案の応用}
 スレッドの合流が静的スコープに従わない並列処理は、
 本研究の新たな参照オブジェクトにより図\ref{scoped_example}のように表すことができる。
-関数\texttt{my\_spawn}は、引数として\texttt{String}オブジェクトへのimmutableな参照を受け取り、
+関数\texttt{my\_spawn}は、引数として\texttt{String}オブジェクトを保持する\texttt{FRefImmut}な参照を受け取り、
 スレッドを生成し、スレッドのハンドラを返す関数である。
 このプログラムは、関数\texttt{my\_spawn}により\texttt{main}関数外で生成したスレッドが
 \texttt{main}関数内で合流するというプログラムである。
-16行目でmutableな参照を生成し、17、18行目でimmutableな参照に変換した後、複製している。
+16行目で\texttt{FRefMut}を生成し、17、18行目で\texttt{FRefImmut}に変換した後、複製している。
 その後、関数\texttt{my\_spawn}によりスレッドを生成し、
 21、22行目で\texttt{main}関数内でスレッドが合流している。
 その後関数\texttt{drop}によりownershipの集約が起き、
-関数\texttt{back\_to\_mut}によりmutableな参照に戻している。
+関数\texttt{back\_to\_mut}により\texttt{FRefMut}に戻している。
 \begin{figure}[htp]
 \begin{lstlisting}[caption=新たな参照オブジェクトを用いた並列処理の例, 
   label=scoped_example, captionpos=b]
@@ -1421,8 +1422,10 @@ Rustには、Readers-Writer Lock\cite{DBLP:journals/cacm/CouroisHP71}がある�
 これは、複数の読み取りは許すが書き込みのアクセスの際は排他的な場合のみ許すロックである。
 図\ref{rwlock}は、図\ref{scoped_example}をReaders-Writer Lockを用いて表したプログラムである。
 しかし、Readers-Writer Lockを用いた際には、
-16行目のように本来不要なロックが発生するおそれがあり、
-本研究の提案によって不要なロックを減らすことができている。
+16行目のように本来不要なロックが発生するおそれがある。
+本研究の提案を応用すると、
+ロックではなく\texttt{FRefMut}と\texttt{FRefImmut}の
+区別により競合状態を防止できる。
 \begin{figure}[htp]
 \begin{lstlisting}[caption=Readers-Writer Lockを用いた並列処理の例, 
   label=rwlock, captionpos=b]
