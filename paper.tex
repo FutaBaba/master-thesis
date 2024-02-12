@@ -250,9 +250,8 @@ fn main() {
 なってしまう。
 このように、\texttt{Rc}オブジェクトを用いた場合、
 意図せず複製が残ってしまうことにより、
-メモリリークのおそれがある。
-% Rustは、メモリリークを防止できるというメリットがあるが、
-% \texttt{Rc}オブジェクトを用いるとこのメリットが損なわれてしまう。
+メモリリークのおそれがあり、
+Rustの、メモリリークを防止できるというメリットが損なわれてしまう。
 このメモリリークは、後ほど第3章で述べるように、
 3行目から16行目を別のスコープにすることで防ぐことができる。
 また、同様に第3章で詳しく述べているが、
@@ -823,8 +822,8 @@ fn main() {
 ユーザによるミスが起こりやすく、結果としてメモリリークが起きる場合がある。
 現在、Rustでこのようなメモリリークが起きないことは静的に検査する手段が存在しないだけでなく、
 動的に検査する手段も存在していない。
-Rustはメモリリークを防止できるというメリットがあるが、
-\texttt{Rc}オブジェクトを用いるとそのメリットが損なわれることになる。
+また、Rustはメモリリークを防止できるというメリットがあるが、
+\texttt{Rc}オブジェクトを用いるとそのメリットは損なわれてしまう。
 
 \chapter{本研究の提案}
 本研究では、Rustの静的なownershipによるメモリ管理と、
@@ -837,14 +836,14 @@ Rustはメモリリークを防止できるというメリットがあるが、
 という問題を解決するために、
 図\ref{random_example}のように用いることができる参照オブジェクトを提案する。
 このプログラムは、中身に\texttt{"Hello"}という\texttt{String}オブジェクトを持つ
-\texttt{FRefMut}オブジェクト\texttt{h}と、中身に\texttt{"World"}という\texttt{String}オブジェクトを持つ
-\texttt{FRefMut}オブジェクト\texttt{w}をどちらも\texttt{FRefImmut}オブジェクトに変換した後、
+mutableな参照オブジェクト\texttt{h}と、中身に\texttt{"World"}という\texttt{String}オブジェクトを持つ
+mutableな参照オブジェクト\texttt{w}をどちらもimmutableな参照オブジェクトに変換した後、
 複製をランダムに10回配列に入れ、
-その配列から\texttt{"Hello"}という\texttt{String}オブジェクトを持つ\texttt{FRefImmut}オブジェクトを
+その配列から\texttt{"Hello"}という\texttt{String}オブジェクトを持つmutableな参照オブジェクトを
 削除するプログラムである。
-7、8行目で生成した\texttt{FRefMut}オブジェクトを、10、11行目で\texttt{FRefImmut}オブジェクトに変換し、
-14、19行目で\texttt{FRefImmut}オブジェクトを複製している。
-\texttt{remove\_string}が終了した後、26行目、32行目で\texttt{FRefMut}オブジェクトに戻している。
+7、8行目で生成したmutableな参照オブジェクトを、10、11行目でimmutableな参照オブジェクトに変換し、
+14、19行目でimmutableな参照オブジェクトを複製している。
+\texttt{remove\_string}が終了した後、26行目、32行目でmutableな参照オブジェクトに戻している。
 \begin{figure}[htp]
 \begin{lstlisting}[caption=新たな参照オブジェクトを用いた柔軟なメモリ管理の例, 
   label=random_example, captionpos=b]
@@ -857,30 +856,30 @@ fn remove_string(vec: &mut Vec<FRefImmut<String>>, s: String) {
 
 fn main() {
   let mut vec: Vec<FRefImmut<String>> = Vec::new();
-  let mut h = FRefMut::new(String::from("Hello")); // FRefMutの生成
-  let mut w = FRefMut::new(String::from("World")); // FRefMutの生成
+  let mut h = FRefMut::new(String::from("Hello")); // Mutableな参照
+  let mut w = FRefMut::new(String::from("World")); // Mutableな参照
   let mut rng = rand::thread_rng();
-  let h_immut = h.to_immut(); // FRefMutからFRefImmutへ変換
-  let w_immut = w.to_immut(); // FRefMutからFRefImmutへ変換
+  let h_immut = h.to_immut(); // Mutableからimmutableへ変換
+  let w_immut = w.to_immut(); // Mutableからimmutableへ変換
   for _ in 0..10 {
     if rng.gen() {
-      let h_immut1 = h_immut.clone_immut(); // FRefImmutの複製
+      let h_immut1 = h_immut.clone_immut(); // 参照の複製
       println!("{}", h_immut1);
       vec.push(h_immut1);
     }
     else {
-      let w_immut1 = w_immut.clone_immut(); // FRefImmutの複製
+      let w_immut1 = w_immut.clone_immut(); // 参照の複製
       println!("{}", w_immut1);
       vec.push(w_immut1);
     }
   }
   remove_string(&mut vec, String::from("Hello"));
-  let mut h_mut = h_immut.back_to_mut(); // FRefImmutからFRefMutへ
+  let mut h_mut = h_immut.back_to_mut(); // Immutableからmutableへ
   h_mut.push_str("hoge");
   println!("{}", h_mut);
   drop(h_mut);
   drop(vec);
-  let mut w_mut = w_immut.back_to_mut(); // FRefImmutからFRefMutへ
+  let mut w_mut = w_immut.back_to_mut(); // Immutableからmutableへ
 }
 \end{lstlisting}
 \end{figure}
@@ -1394,25 +1393,25 @@ use fRef_implementation::fractional_ref::FRefMut;
 use std::thread;
 use std::thread::JoinHandle;
 fn my_spawn (a: &FRefImmut<String>) -> JoinHandle<()>{
-    let builder = thread::Builder::new();
-    unsafe {
-        let t = builder.spawn_unchecked(||{
-            println!("{}", a);
-        }).unwrap();
-        return t
-    }
+  let builder = thread::Builder::new();
+  unsafe {
+    let t = builder.spawn_unchecked(||{
+      println!("{}", a);
+    }).unwrap();
+    return t
+  }
 }
 fn main() {
-    let mut s = FRefMut::new(String::from("Hello")); // 参照生成
-    let s1 = s.to_immut(); // Mutableからimmutableへ変換
-    let s2 = s1.clone_immut(); // 参照の複製
-    let t1 = my_spawn(&s1);
-    let t2 = my_spawn(&s2); 
-    t1.join();
-    t2.join();
-    drop(s2);
-    let mut s3 = s1.back_to_mut(); // Immutableからmutableへ変換
-    s3.push_str("World");
+  let mut s = FRefMut::new(String::from("Hello")); // FRefMutの生成
+  let s1 = s.to_immut(); // FRefMutからFRefImmutへ変換
+  let s2 = s1.clone_immut(); // FRefImmutの複製
+  let t1 = my_spawn(&s1);
+  let t2 = my_spawn(&s2); 
+  t1.join();
+  t2.join();
+  drop(s2);
+  let mut s3 = s1.back_to_mut(); // FRefImmutからFRefMutへ変換
+  s3.push_str("World");
 }
 \end{lstlisting}
 \end{figure}
