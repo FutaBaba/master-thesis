@@ -3,55 +3,45 @@ Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: paper.aux
 The style file: jplain.bst
 Database file #1: refs.bib
-Warning--I didn't find a database entry for "rust-web"
-Warning--I didn't find a database entry for "rust-book"
-Warning--I didn't find a database entry for "redox"
-Warning--I didn't find a database entry for "dropbox"
-Warning--I didn't find a database entry for "fire"
-Warning--I didn't find a database entry for "c-book"
-Warning--I didn't find a database entry for "gc-book"
-Warning--I didn't find a database entry for "rc"
-Warning--I didn't find a database entry for "nll"
-You've used 7 entries,
+You've used 16 entries,
             2620 wiz_defined-function locations,
-            664 strings with 6581 characters,
-and the built_in function-call counts, 4049 in all, are:
-= -- 376
-> -- 146
+            700 strings with 7651 characters,
+and the built_in function-call counts, 6512 in all, are:
+= -- 572
+> -- 219
 < -- 12
-+ -- 57
-- -- 49
-* -- 244
-:= -- 542
-add.period$ -- 26
-call.type$ -- 7
-change.case$ -- 41
++ -- 91
+- -- 71
+* -- 311
+:= -- 900
+add.period$ -- 59
+call.type$ -- 16
+change.case$ -- 76
 chr.to.int$ -- 0
-cite$ -- 7
-duplicate$ -- 206
-empty$ -- 323
-format.name$ -- 78
-if$ -- 955
+cite$ -- 16
+duplicate$ -- 341
+empty$ -- 584
+format.name$ -- 111
+if$ -- 1518
 int.to.chr$ -- 0
-int.to.str$ -- 7
-missing$ -- 7
-newline$ -- 38
-num.names$ -- 24
-pop$ -- 61
+int.to.str$ -- 16
+missing$ -- 13
+newline$ -- 89
+num.names$ -- 42
+pop$ -- 173
 preamble$ -- 1
-purify$ -- 34
+purify$ -- 63
 quote$ -- 0
-skip$ -- 197
+skip$ -- 321
 stack$ -- 0
-substring$ -- 255
-swap$ -- 77
+substring$ -- 303
+swap$ -- 86
 text.length$ -- 12
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 28
+type$ -- 58
 warning$ -- 0
-while$ -- 40
-width$ -- 8
-write$ -- 87
-is.kanji.str$ -- 104
-(There were 9 warnings)
+while$ -- 58
+width$ -- 18
+write$ -- 188
+is.kanji.str$ -- 174

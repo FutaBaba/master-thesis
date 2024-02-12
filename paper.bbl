@@ -1,4 +1,4 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
 
 \bibitem{DBLP:conf/sas/Boyland03}
 John Boyland.
@@ -8,6 +8,19 @@ John Boyland.
   Vol. 2694 of {\em Lecture Notes in Computer Science}, pp. 55--72. Springer,
   2003.
 
+\bibitem{c-book}
+Dennis M.~Ritchie Brian W.~Kernighan.
+\newblock {\em The {C} {P}rogramming {L}anguage}.
+\newblock Prentice {H}all, 1981.
+
+\bibitem{fire}
+Lin Clark.
+\newblock Inside a super fast {CSS} engine: {Q}uantum {CSS} (aka {S}tylo).
+\newblock
+  https://hacks.mozilla.org/2017/08/inside-a-super-fast-css-engine-quantum-css-aka-stylo/,
+  2017.
+\newblock 2024年1月24日アクセス.
+
 \bibitem{DBLP:conf/oopsla/ClarkePN98}
 David~G. Clarke, John Potter, and James Noble.
 \newblock Ownership types for flexible alias protection.
@@ -16,10 +29,36 @@ David~G. Clarke, John Potter, and James Noble.
   Programming Systems, Languages {\&} Applications, {OOPSLA} 1998, Vancouver,
   British Columbia, Canada, October 18-22, 1998}, pp. 48--64. {ACM}, 1998.
 
+\bibitem{rc}
+Rust Community.
+\newblock Rust {B}y {E}xample {R}c.
+\newblock https://doc.rust-lang.org/rust-by-example/std/rc.html.
+\newblock 2024年1月20日アクセス.
+
+\bibitem{nll}
+Rust Community.
+\newblock Non-{L}exical {L}ifetimes {RFC}.
+\newblock https://github.com/rust-lang/rfcs/blob/master/text/2094-nll.md, 2023.
+\newblock 2024年1月20日アクセス.
+
 \bibitem{DBLP:journals/cacm/CouroisHP71}
 Pierre{-}Jacques Courtois, F.~Heymans, and David~Lorge Parnas.
 \newblock Concurrent control with "readers" and "writers".
 \newblock {\em Commun. {ACM}}, Vol.~14, No.~10, pp. 667--668, 1971.
+
+\bibitem{redox}
+Redox Developers.
+\newblock Redox {OS}.
+\newblock https://www.redox-os.org/, 2015.
+\newblock 2024年1月20日アクセス.
+
+\bibitem{dropbox}
+Daniel~Reiter Horn and Mehant Baid.
+\newblock Lossless compression with {B}rotli in {R}ust for a bit of {P}ied
+  {P}iper on the backend.
+\newblock https://dropbox.tech/infrastructure/lossless-compression-with-brotli,
+  2016.
+\newblock 2024年1月24日アクセス.
 
 \bibitem{DBLP:journals/pacmpl/0002JKD18}
 Ralf Jung, Jacques{-}Henri Jourdan, Robbert Krebbers, and Derek Dreyer.
@@ -28,9 +67,14 @@ Ralf Jung, Jacques{-}Henri Jourdan, Robbert Krebbers, and Derek Dreyer.
 \newblock {\em Proc. {ACM} Program. Lang.}, Vol.~2, No. {POPL}, pp.
   66:1--66:34, 2018.
 
+\bibitem{rust-book}
+Steve Klabnik and Carol Nichols.
+\newblock {\em {T}he {R}ust {P}rogramming {L}anguage, 2nd {E}dition}.
+\newblock No {S}tarch {P}ress, 2022.
+
 \bibitem{DBLP:conf/sigada/MatsakisK14}
 Nicholas~D. Matsakis and Felix S.~Klock II.
-\newblock The rust language.
+\newblock The {r}ust language.
 \newblock In Michael~B. Feldman and S.~Tucker Taft, editors, {\em Proceedings
   of the 2014 {ACM} SIGAda annual conference on High integrity language
   technology, {HILT} 2014, Portland, Oregon, USA, October 18-21, 2014}, pp.
@@ -44,10 +88,22 @@ Takashi Nakayama, Yusuke Matsushita, Ken Sakayori, Ryosuke Sato, and Naoki
   Verification, Model Checking, and Abstract Interpretation}, pp. 224--246,
   Cham, 2024. Springer Nature Switzerland.
 
+\bibitem{gc-book}
+Eliot~Moss Richard~Jones, Antony~Hosking.
+\newblock {\em The {G}arbage {C}ollection {H}andbook: {T}he art of automatic
+  memory management}.
+\newblock Chapman \& {H}all/{CRC}, 2012.
+
 \bibitem{10.1007/978-3-642-10672-9_11}
 Kohei Suenaga and Naoki Kobayashi.
 \newblock Fractional ownerships for safe memory deallocation.
 \newblock In Zhenjiang Hu, editor, {\em Programming Languages and Systems}, pp.
   128--143, Berlin, Heidelberg, 2009. Springer Berlin Heidelberg.
+
+\bibitem{rust-web}
+The~Rust team.
+\newblock The {R}ust programming language.
+\newblock http://rust-lang.org/, 2023.
+\newblock 2024年1月19日アクセス.
 
 \end{thebibliography}

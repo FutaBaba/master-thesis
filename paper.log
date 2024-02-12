@@ -1,4 +1,4 @@
-This is e-pTeX, Version 3.14159265-p3.8.2-190908-2.6 (utf8.euc) (TeX Live 2019/Debian) (preloaded format=platex 2023.11.13)  12 FEB 2024 18:30
+This is e-pTeX, Version 3.14159265-p3.8.2-190908-2.6 (utf8.euc) (TeX Live 2019/Debian) (preloaded format=platex 2023.11.13)  13 FEB 2024 01:04
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -402,49 +402,10 @@ LaTeX Font Info:    Font shape `JT1/gt/m/n' will be
 (Font)              scaled to size 13.83836pt on input line 183.
 LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
 (Font)              scaled to size 13.83836pt on input line 183.
-LaTeX Font Info:    Font shape `JT1/mc/b/n' in size <10> not available
-(Font)              Font shape `JT1/mc/bx/n' tried instead on input line 184.
-LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <10> not available
-(Font)              Font shape `JT1/gt/m/n' tried instead on input line 184.
 LaTeX Font Info:    Font shape `JT1/gt/m/n' will be
-(Font)              scaled to size 9.60999pt on input line 184.
-LaTeX Font Info:    Font shape `JY1/mc/b/n' in size <10> not available
-(Font)              Font shape `JY1/mc/bx/n' tried instead on input line 184.
-LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <10> not available
-(Font)              Font shape `JY1/gt/m/n' tried instead on input line 184.
+(Font)              scaled to size 8.64899pt on input line 224.
 LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
-(Font)              scaled to size 9.60999pt on input line 184.
-
-LaTeX Warning: Citation `rust-web' on page 1 undefined on input line 184.
-
-
-LaTeX Warning: Citation `rust-book' on page 1 undefined on input line 184.
-
-
-LaTeX Warning: Citation `redox' on page 1 undefined on input line 188.
-
-
-LaTeX Warning: Citation `dropbox' on page 1 undefined on input line 189.
-
-
-LaTeX Warning: Citation `fire' on page 1 undefined on input line 190.
-
-
-LaTeX Warning: Citation `rust-web' on page 1 undefined on input line 191.
-
-
-LaTeX Warning: Citation `c-book' on page 1 undefined on input line 194.
-
-
-LaTeX Warning: Citation `gc-book' on page 1 undefined on input line 195.
-
-
-LaTeX Warning: Citation `rc' on page 1 undefined on input line 206.
-
-LaTeX Font Info:    Font shape `JT1/gt/m/n' will be
-(Font)              scaled to size 8.64899pt on input line 226.
-LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
-(Font)              scaled to size 8.64899pt on input line 226.
+(Font)              scaled to size 8.64899pt on input line 224.
 LaTeX Font Info:    Font shape `JT1/mc/m/n' will be
 (Font)              scaled to size 8.64899pt on input line 1.
 LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
@@ -455,13 +416,13 @@ LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
 ] [2] [3] [4] [5]
 第2章
 LaTeX Font Info:    Font shape `JT1/mc/m/n' will be
-(Font)              scaled to size 11.53198pt on input line 377.
+(Font)              scaled to size 11.53198pt on input line 375.
 LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
-(Font)              scaled to size 11.53198pt on input line 377.
+(Font)              scaled to size 11.53198pt on input line 375.
 LaTeX Font Info:    Font shape `JT1/gt/m/n' will be
-(Font)              scaled to size 11.53198pt on input line 377.
+(Font)              scaled to size 11.53198pt on input line 375.
 LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
-(Font)              scaled to size 11.53198pt on input line 377.
+(Font)              scaled to size 11.53198pt on input line 375.
 [6
 
 ] [7]
@@ -481,11 +442,7 @@ LaTeX Font Info:    Font shape `OT1/cmtt/bx/n' in size <9> not available
 (Font)              Font shape `OT1/cmtt/m/n' tried instead on input line 1.
  [8
 
-]
-
-LaTeX Warning: Citation `nll' on page 9 undefined on input line 563.
-
-[9] [10] [11] [12
+] [9] [10] [11] [12
 
 ]
 第3章
@@ -532,25 +489,39 @@ LaTeX Font Info:    Font shape `JY1/gt/m/it' in size <10> not available
 LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
 (Font)              scaled to size 9.60999pt on input line 6.
 
-Underfull \hbox (badness 1394) in paragraph at lines 40--46
-[]\OT1/cmr/m/n/10 Takashi Nakayama, Yusuke Mat-sushita, Ken Sakay-ori, Ryosuke 
-Sato, and Naoki
+Underfull \hbox (badness 3989) in paragraph at lines 17--23
+[]\OT1/cmr/m/n/10 Lin Clark.  In-side a su-per fast CSS en-gine: Quan-tum CSS (
+aka Stylo).
  []
 
-) [38
 
-] (./paper.aux)
+Underfull \hbox (badness 10000) in paragraph at lines 17--23
+\OT1/cmr/m/n/10 https://hacks.mozilla.org/2017/08/inside-a-super-fast-css-engin
+e-quantum-css-aka-
+ []
 
-LaTeX Warning: There were undefined references.
 
- ) 
+Underfull \hbox (badness 3815) in paragraph at lines 33--37
+[]\OT1/cmr/m/n/10 Rust Com-mu-nity.  Rust By Ex-am-ple Rc.  https://doc.rust-la
+ng.org/rust-by-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 39--43
+[]\OT1/cmr/m/n/10 Rust Com-mu-nity.  Non-Lexical Life-times RFC.  https://githu
+b.com/rust-
+ []
+
+[38
+
+]) [39] (./paper.aux) ) 
 Here is how much of TeX's memory you used:
- 5841 strings out of 481768
- 78890 string characters out of 5933619
- 569563 words of memory out of 5000000
- 21179 multiletter control sequences out of 15000+600000
+ 5839 strings out of 481768
+ 78864 string characters out of 5933619
+ 569597 words of memory out of 5000000
+ 21177 multiletter control sequences out of 15000+600000
  548820 words of font info for 102 fonts, out of 8000000 for 9000
  934 hyphenation exceptions out of 8191
  31i,7n,36p,1208b,1499s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on paper.dvi (40 pages, 196308 bytes).
+Output written on paper.dvi (41 pages, 199904 bytes).

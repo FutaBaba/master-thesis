@@ -183,13 +183,11 @@ Rustの静的なownershipに戻すことができる。
 \section{背景}
 Rust\cite{DBLP:conf/sigada/MatsakisK14, rust-web, rust-book}は、
 ownership\cite{DBLP:conf/oopsla/ClarkePN98}の概念に基づき
-% TODO ownershipの他の主な文献
 静的なメモリ管理を行うプログラミング言語であり、
 Redox OS\cite{redox}や、
 Dropbox\cite{dropbox}、
 Firefox\cite{fire}
 といったシステムプログラミング等に用いられている\cite{rust-web}。
-% もっとリファレンス入れてみる
 Rust登場以前は、メモリ管理はユーザが手動で管理する方式
 \cite{c-book}
 と実行時ガベージコレクタ\cite{gc-book}
@@ -206,7 +204,7 @@ unsafeな機能が内部の実装で用いられているオブジェクトの�
 \texttt{Rc}オブジェクト\cite{rc}が存在する。
 \texttt{Rc}オブジェクトは、中身のオブジェクトへの参照と、共通の参照カウントを持つコンテナであり、動的な参照カウントにより静的なownershipを補っている。
 clone関数により複製が可能であり、その際共通の参照カウントを1増やし、参照が消滅する際には参照カウントを1減らし、参照カウントが0になったときに中身のオブジェクトを解放する。
-本来Rustでは、ownershipの複製をすることはできないが、\texttt{Rc}オブジェクトの内部の実装で用いられているunsafeな機能によりownershipの複製ができるようになる。
+本来Rustでは、borrowingの複製をすることはできないが、\texttt{Rc}オブジェクトの内部の実装で用いられているunsafeな機能によりborrowingの複製ができるようになる。
 なお、Rustの静的なownershipを無視するunsafeな機能が用いられているので、\texttt{Rc}オブジェクトは動的な柔軟性が必要な場合にのみ用いられるべきである。
 
 図\ref{rc_simple}は、
@@ -611,12 +609,10 @@ fn main() {
     let mut rng = rand::thread_rng();
     for _ in 0..10 {
         if rng.gen() {
-            let h_clone = h.clone(); // clone関数により複製を生成
-            vec.push(h_clone);
+            vec.push(h.clone()); // clone関数により複製を生成
         }
         else {
-            let w_clone = w.clone(); // clone関数により複製を生成
-            vec.push(w_clone);
+            vec.push(w.clone()); // clone関数により複製を生成
         }
     }
     remove_string(&mut vec, String::from("Hello")); // hの複製が消滅
@@ -770,11 +766,7 @@ fn main() {
 }
 \end{lstlisting}
 \end{figure}
-% 参照カウントだと、ミスが起こりやすい
-% 静的検査が望ましいがない、せめて動的検査があってほしい
-% into_inner入れればできるが、忘れたらいけない
 
-% ここは実装の部分に移す
 また、\texttt{Rc}オブジェクトの中身のオブジェクトを取り出す
 \texttt{into\_inner}関数を用いることで、
 図\ref{rc_problem}のプログラムは図\ref{rc_random}のように、
@@ -825,6 +817,12 @@ fn main() {
 また、Rustはメモリリークを防止できるというメリットがあるが、
 \texttt{Rc}オブジェクトを用いるとそのメリットは損なわれてしまう。
 
+さらに、デストラクタの実行が遅れることになり、
+デストラクタで行われることが多い
+ファイルを閉じる操作やソケットを閉じる操作が遅れるおそれがある。
+しかも、実際にはいずれデストラクタは実行されるため、
+ユーザはデストラクタの実行が遅れていることに気づきにくい。
+
 \chapter{本研究の提案}
 本研究では、Rustの静的なownershipによるメモリ管理と、
 動的な参照カウントの柔軟性を組み合わせた新たな参照オブジェクトを提案する。
@@ -835,6 +833,7 @@ fn main() {
 \texttt{Rc}オブジェクトを用いた際に、ユーザのミスによるメモリリークが検出できない
 という問題を解決するために、
 図\ref{random_example}のように用いることができる参照オブジェクトを提案する。
+また、この参照オブジェクトはユーザにオブジェクトの解放のタイミングを指定することを強制し、ユーザの意図するタイミングでデストラクタが実行される。
 このプログラムは、中身に\texttt{"Hello"}という\texttt{String}オブジェクトを持つ
 mutableな参照オブジェクト\texttt{h}と、中身に\texttt{"World"}という\texttt{String}オブジェクトを持つ
 mutableな参照オブジェクト\texttt{w}をどちらもimmutableな参照オブジェクトに変換した後、
@@ -903,7 +902,7 @@ fn main() {
 また、図\ref{error_example2}は、図\ref{random_example}とほぼ同じプログラムであるが、
 参照カウントが1でないにも関わらず\texttt{FRefImmut}オブジェクトを\texttt{FRefMut}オブジェクトに戻そうとしているプログラムである。
 この場合、mutableな参照に戻すことができずに図\ref{error_result2}のような実行時エラーが発生するため、
-\texttt{FRefMut}オブジェクトでないと消滅させることはできないようユーザに強制することができている。
+オブジェクトの解放し忘れが検出できる。
 
 図\ref{error_example1}は、図\ref{random_example}とほぼ同じプログラムであるが、
 \texttt{FRefImmut}オブジェクトを\texttt{FRefMut}オブジェクトに戻していないプログラムである。
@@ -1123,7 +1122,7 @@ note: run with `RUST_BACKTRACE=1`
 \section{実装}
 % 0120 check
 \texttt{FRefMut}オブジェクト、\texttt{FRefImmut}オブジェクトは図\ref{struct_implementation}のように実装した。
-\texttt{FRefMut}オブジェクトは、オブジェクトを保持するコンテナとして実装した。
+\texttt{FRefMut}オブジェクトは、中身のオブジェクトを保持するコンテナとして実装した。
 \texttt{FRefImmut}オブジェクトは、
 Rustのownershipを無視する特別なポインタであるNonNullオブジェクトと、
 PhantomDataを保持するオブジェクトとして実装した。
@@ -1132,6 +1131,7 @@ NonNullオブジェクトにより、参照の複製が可能になる。
 コンパイラに示している。
 \texttt{FRefImmut}内のポインタは\texttt{FRefInner}オブジェクトへのポインタであり、
 このオブジェクトは参照カウントと中身のオブジェクトを保持する。
+なお、\texttt{FRefImmut}のownershipは、参照カウント分の1とみなしている。
 \begin{figure}[htp]
 \begin{lstlisting}[caption=新たな参照オブジェクトの実装, label=struct_implementation, captionpos=b]
 pub struct FRefMut<T: ?Sized> {
@@ -1153,26 +1153,30 @@ struct FRefInner<T: ?Sized> {
 図\ref{new_to_implementation}ように実装した。
 4行目で\texttt{to\_immut}関数の引数は、borrowingでなくmoveが起きるようにすることで、
 変換した後引数の\texttt{FRefMut}が消滅するように実装した。
+また、7行目の\texttt{ptr::read}関数により\texttt{FRefMut}の中身のオブジェクト
+を取り出し、8行目の部分で取り出した中身のオブジェクトをもとに\texttt{FRefInner}を作成している。
+そして、12行目の部分でxをdropせずに生ポインタである\texttt{NonNull}に変換している。
 
 \texttt{FRefImmut}オブジェクトを引数として受け取り、
 複製した参照を返す\texttt{clone\_immut}関数は図\ref{clone_implementation}ように実装した。
 \texttt{clone\_immut}関数の引数をborrowingにすることで、複製元の参照が消滅せずに利用できるように実装した。
 また、2行目の\texttt{fetch\_add}関数によって\texttt{FRefImmut}の内部の参照カウントが1増加するように実装した。
+そして、7行目でRustのownershipを無視し、生ポインタの複製を行っている。
+
+\texttt{FRefImmut}オブジェクトを引数として受け取り、
+その参照を消滅させる\texttt{drop}関数は図\ref{drop_implementation}のように実装した。
+参照カウントが1より大きい場合は、参照カウントを1減少させ、
+参照カウントが1である場合は実行時エラーが起きるようにすることで、
+\texttt{FRefImmut}を\texttt{FRefMut}に戻さずに消滅できなように実装した。
+これにより、オブジェクトの解放し忘れを検出することが可能である。
 
 \texttt{FRefImmut}オブジェクトを引数として受け取り、
 \texttt{FRefMut}オブジェクトに変換する\texttt{back\_to\_mut}関数は
 図\ref{back_implementation}のように実装した。
 \texttt{back\_to\_mut}関数の引数をborowwingでなくmoveするようにし、
 変換した後引数の\texttt{FRefImmut}が消滅するように実装した。
-また、2行目で\texttt{FRefImmut}の参照カウントが1でなければ実行時エラーが起きるようにし、
+また、2、3行目で\texttt{FRefImmut}の参照カウントが1でなければ実行時エラーが起きるようにし、
 \texttt{FRefImmut}のままでは消滅できないように実装した。
-
-\texttt{FRefImmut}オブジェクトを引数として受け取り、
-その参照を消滅させる\texttt{drop}関数は図\ref{drop_implementation}のように実装した。
-参照カウントが2以上である場合は、参照カウントを1減少させ、
-参照カウントが1である場合は実行時エラーが起きるようにすることで、
-\texttt{FRefImmut}を\texttt{FRefMut}に戻さずに消滅できなように実装した。
-これにより、オブジェクトの解放し忘れを検出することが可能である。
 
 \begin{figure}[htp]
 \begin{lstlisting}[caption=関数newと関数to\_immutの実装, label=new_to_implementation, captionpos=b]
@@ -1206,24 +1210,6 @@ pub fn clone_immut(&self: &FRefImmut<T>) -> FRefImmut<T>
 \end{figure}
 
 \begin{figure}[htp]
-\begin{lstlisting}[caption=関数back\_to\_mutの実装, label=back_implementation, captionpos=b]
-pub fn back_to_mut(self: FRefImmut<T>) -> FRefMut<T> { // Move
-    if self.inner().ref_count.load(Acquire) != 1{
-        panic!("cannot back to mut");
-    }
-    let mut this = ManuallyDrop::new(self);
-    let inner =
-        unsafe { ptr::read(&mut (*this.ptr.as_ptr()).data)};
-    unsafe {
-        dealloc(this.ptr.cast().as_mut(), 
-                Layout::for_value_raw(this.ptr.as_ptr()))
-    }
-    FRefMut { data: inner }
-}
-\end{lstlisting}
-\end{figure}
-
-\begin{figure}[htp]
 \begin{lstlisting}[caption=関数dropの実装, label=drop_implementation, captionpos=b]
 impl<T: ?Sized> Drop for FRefImmut<T> {
     fn drop(&mut self) {
@@ -1246,7 +1232,25 @@ impl<T: ?Sized> Drop for FRefImmut<T> {
 \end{lstlisting}
 \end{figure}
 
-なお、実装からわかるように提案する参照オブジェクトは\texttt{Rc}オブジェクトの利用方法を強制しているオブジェクトであることから、\texttt{Rc}オブジェクトと\texttt{Rc}オブジェクトの中身を取り出す関数\texttt{into\_inner}を用いて実装することが可能のように思える。
+\begin{figure}[htp]
+\begin{lstlisting}[caption=関数back\_to\_mutの実装, label=back_implementation, captionpos=b]
+pub fn back_to_mut(self: FRefImmut<T>) -> FRefMut<T> { // Move
+    if self.inner().ref_count.load(Acquire) != 1{
+        panic!("cannot back to mut");
+    }
+    let mut this = ManuallyDrop::new(self);
+    let inner =
+        unsafe { ptr::read(&mut (*this.ptr.as_ptr()).data)};
+    unsafe {
+        dealloc(this.ptr.cast().as_mut(), 
+                Layout::for_value_raw(this.ptr.as_ptr()))
+    }
+    FRefMut { data: inner }
+}
+\end{lstlisting}
+\end{figure}
+
+なお実装からわかるように、提案する参照オブジェクトは、\texttt{Rc}オブジェクトの利用方法を強制しているオブジェクトであることから、\texttt{Rc}オブジェクトと\texttt{Rc}オブジェクトの中身を取り出す関数\texttt{into\_inner}を用いて実装することが可能であるように思える。
 その際、図\ref{into_inner}のようにimmutableな参照オブジェクトのフィールドが\texttt{Rc}オブジェクトになる。
 Immutableな参照からmutableな参照に戻す際には、フィールドに対して\texttt{into\_inner}を呼び出す必要があり、
 \texttt{into\_inner}の引数は、borrowingでなくmoveが起きることから、オブジェクトのフィールドはmoveする。
@@ -1483,7 +1487,7 @@ Fractional ownershipの考え方を取り入れ、Rustの静的なownershipに�
 この参照オブジェクトにより、オブジェクトの解放し忘れを実行時に検出し、メモリリークを防ぐことができる。
 今後の課題は、新たな参照オブジェクトがメモリ安全であることを証明することが挙げられる。
 また、新たな参照オブジェクトをより具体的な例で利用し、どれほどメモリリークを防ぐことができたかを実験することも
-挙げられる。
+挙げられる。また、Weak Referenceの導入も挙げられる。
 
 \backmatter% ここから後付
 \chapter{謝辞}
